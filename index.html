@@ -484,6 +484,97 @@
       body:not(.print-a4) { @page { size: 57mm auto; margin: 1.5mm; } }
       body:not(.print-a4) #print-area { width: 54mm !important; margin: 0 !important; padding: 0 !important; }
     }
+    /* iOS / Android 风格平滑收缩动画 */
+#main-header,
+#main-header * ,
+.cat-bar,
+.table-bar {
+  transition:
+    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    min-height 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    font-size 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.26s ease,
+    gap 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, padding;
+}
+
+@media (max-width: 768px) {
+  #page-order.page.active {
+    padding-bottom: 84px;
+  }
+
+  #mobile-sticky-order-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 95;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(15, 23, 42, 0.1);
+    box-shadow: 0 -6px 22px rgba(15, 23, 42, 0.1);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  body.dark #mobile-sticky-order-bar {
+    background: rgba(20, 26, 38, 0.94);
+    border-top-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 -6px 22px rgba(0, 0, 0, 0.38);
+  }
+
+  #mobile-sticky-order-bar .m-sticky-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+  }
+
+  #mobile-sticky-order-bar .m-sticky-sub {
+    font-size: 12px;
+    opacity: 0.78;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #mobile-sticky-order-bar .m-sticky-total {
+    font-size: 15px;
+    font-weight: 800;
+    color: #059669;
+    white-space: nowrap;
+  }
+
+  #mobile-sticky-order-bar .m-sticky-btn {
+    flex-shrink: 0;
+    border: none;
+    border-radius: 12px;
+    padding: 11px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    background: #10b981;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.28);
+    cursor: pointer;
+    transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+  }
+
+  #mobile-sticky-order-bar .m-sticky-btn:active {
+    transform: scale(0.96);
+  }
+}
+
+@media (min-width: 769px) {
+  #mobile-sticky-order-bar {
+    display: none !important;
+  }
+}
   </style>
 </head>
 <body>
@@ -2979,6 +3070,96 @@ function renderAccounting() {
   }, 15000);
 })();
 
+(function setupMobileStickyOrderBar() {
+  function ensureBar() {
+    let bar = document.getElementById('mobile-sticky-order-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'mobile-sticky-order-bar';
+      bar.innerHTML = `
+        <div class="m-sticky-info">
+          <span class="m-sticky-sub" id="m-sticky-sub"></span>
+          <span class="m-sticky-total" id="m-sticky-total">RM 0.00</span>
+        </div>
+        <button type="button" class="m-sticky-btn" id="m-sticky-send-btn"></button>
+      `;
+      document.body.appendChild(bar);
+
+      const btn = document.getElementById('m-sticky-send-btn');
+      if (btn) {
+        btn.onclick = () => {
+          if (typeof triggerHaptic === 'function') triggerHaptic();
+          if (typeof submitOrder === 'function') submitOrder();
+        };
+      }
+    }
+    return bar;
+  }
+
+  function syncBar() {
+    const bar = ensureBar();
+    const orderPage = document.getElementById('page-order');
+    const isOrderActive = orderPage && orderPage.classList.contains('active');
+    if (!isOrderActive) {
+      bar.style.display = 'none';
+      return;
+    }
+    bar.style.display = '';
+
+    const isZh = typeof lang !== 'undefined' && lang === 'zh';
+    const qtyCount = Array.isArray(cart)
+      ? cart.reduce((sum, item) => sum + Number(item.qty || 1), 0)
+      : 0;
+    const totalVal = Array.isArray(cart)
+      ? cart.reduce((sum, item) => sum + (typeof getCartItemRowTotal === 'function' ? Number(getCartItemRowTotal(item) || 0) : 0), 0)
+      : 0;
+
+    const tblText = (typeof selectedTables !== 'undefined' && Array.isArray(selectedTables) && selectedTables.length)
+      ? selectedTables.join(' + ')
+      : (isZh ? '未选桌号' : 'No Table');
+
+    const subEl = document.getElementById('m-sticky-sub');
+    const totEl = document.getElementById('m-sticky-total');
+    const btnEl = document.getElementById('m-sticky-send-btn');
+
+    if (subEl) {
+      subEl.textContent = isZh
+        ? `${tblText} · 已选 ${qtyCount} 项`
+        : `${tblText} · ${qtyCount} item(s)`;
+    }
+    if (totEl) {
+      totEl.textContent = `${isZh ? '合计' : 'Total'}: RM ${totalVal.toFixed(2)}`;
+    }
+    if (btnEl) {
+      const isEditing = typeof editingActiveOrderIdx !== 'undefined' && editingActiveOrderIdx >= 0;
+      btnEl.textContent = isEditing
+        ? (isZh ? '✓ 保存修改' : '✓ Update Order')
+        : (isZh ? '✓ 送出订单' : '✓ Send Order');
+    }
+  }
+
+  const origRenderCart = window.renderCart;
+  if (typeof origRenderCart === 'function') {
+    window.renderCart = function (...args) {
+      const res = origRenderCart.apply(this, args);
+      syncBar();
+      return res;
+    };
+  }
+
+  const origSwitchPage = window.switchPage;
+  if (typeof origSwitchPage === 'function') {
+    window.switchPage = function (...args) {
+      const res = origSwitchPage.apply(this, args);
+      syncBar();
+      return res;
+    };
+  }
+
+  document.addEventListener('click', () => setTimeout(syncBar, 30));
+  window.addEventListener('resize', syncBar);
+  setTimeout(syncBar, 200);
+})();
 init();
 </script>
 </body>
