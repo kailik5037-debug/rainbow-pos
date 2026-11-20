@@ -1,0 +1,3393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#007aff" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link id="pwa-manifest-link" rel="manifest" href="" />
+  <title>Rainbow Ice Parlour & Coffee House Since 1991 - POS</title>
+  <style>
+    :root {
+      --primary: #007aff;
+      --primary-deep: #005ecb;
+      --accent: #d97706;
+      --bg-grad:
+        radial-gradient(circle at 12% 10%, rgba(56, 189, 248, 0.30), transparent 44%),
+        radial-gradient(circle at 88% 16%, rgba(168, 85, 247, 0.18), transparent 42%),
+        radial-gradient(circle at 50% 88%, rgba(45, 212, 191, 0.20), transparent 48%),
+        linear-gradient(155deg, #d8e5f4 0%, #e8eff8 52%, #d9e6f5 100%);
+      --header-bg: rgba(255, 255, 255, 0.56);
+      --header-border: rgba(255, 255, 255, 0.78);
+      --header-text: #0f172a;
+      --notif-panel: rgba(255, 255, 255, 0.36);
+      --table-bar-bg: rgba(255, 255, 255, 0.36);
+      --tbl-btn-bg: rgba(255, 255, 255, 0.45);
+      --tbl-btn-hover: rgba(255, 255, 255, 0.74);
+      --notif-card: rgba(255, 255, 255, 0.48);
+      --notif-card-hover: rgba(255, 255, 255, 0.76);
+      --input-bg: rgba(255, 255, 255, 0.50);
+      --input-focus-bg: rgba(255, 255, 255, 0.80);
+      --modal-bg: rgba(255, 255, 255, 0.88);
+      --glass-border: rgba(255, 255, 255, 0.80);
+      --glass-line: rgba(15, 23, 42, 0.08);
+      --notif-shadow:
+        0 10px 26px rgba(15, 23, 42, 0.08),
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.92),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.35);
+      --text: #162032;
+      --muted: #526075;
+      --price-color: #047857;
+      --danger: #e11d48;
+      --display-font: "SF Pro Display", -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+      --body-font: "SF Pro Text", -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, "Microsoft YaHei", sans-serif;
+    }
+
+    body.dark-mode {
+      --primary: #3b82f6;
+      --primary-deep: #2563eb;
+      --accent: #d99b38;
+      --bg-grad:
+        radial-gradient(circle at 14% 12%, rgba(59, 130, 246, 0.14), transparent 46%),
+        radial-gradient(circle at 86% 18%, rgba(100, 116, 139, 0.14), transparent 45%),
+        radial-gradient(circle at 60% 90%, rgba(20, 184, 166, 0.10), transparent 50%),
+        linear-gradient(155deg, #14171d 0%, #1b1f27 52%, #13161c 100%);
+      --header-bg: rgba(24, 28, 36, 0.78);
+      --header-border: rgba(255, 255, 255, 0.13);
+      --header-text: #d6dde6;
+      --notif-panel: rgba(25, 29, 38, 0.56);
+      --table-bar-bg: rgba(28, 33, 43, 0.56);
+      --tbl-btn-bg: rgba(255, 255, 255, 0.06);
+      --tbl-btn-hover: rgba(255, 255, 255, 0.12);
+      --notif-card: rgba(255, 255, 255, 0.055);
+      --notif-card-hover: rgba(255, 255, 255, 0.11);
+      --input-bg: rgba(255, 255, 255, 0.06);
+      --input-focus-bg: rgba(255, 255, 255, 0.11);
+      --modal-bg: rgba(27, 31, 40, 0.92);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --glass-line: rgba(255, 255, 255, 0.08);
+      --notif-shadow:
+        0 10px 26px rgba(0, 0, 0, 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+      --text: #d4dbe4;
+      --muted: #8e99a8;
+      --price-color: #34b38a;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: var(--body-font);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-grad);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: background 0.25s ease, color 0.2s ease;
+    }
+
+    #app-zoom-shell {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .icon-3d {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      line-height: 1;
+      flex-shrink: 0;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.22));
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      box-shadow: 0 3px 7px rgba(15, 23, 42, 0.14), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+    }
+    body.dark-mode .icon-3d {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.04));
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .icon-3d-blue { background: linear-gradient(145deg, #60a5fa, #2563eb); color: #f8fafc; border-color: rgba(255, 255, 255, 0.45); }
+    .icon-3d-amber { background: linear-gradient(145deg, #eab308, #b45309); color: #fffbeb; border-color: rgba(255, 255, 255, 0.45); }
+    .icon-3d-green { background: linear-gradient(145deg, #34d399, #059669); color: #ecfdf5; border-color: rgba(255, 255, 255, 0.45); }
+
+    header {
+      background: var(--header-bg);
+      backdrop-filter: blur(32px) saturate(185%);
+      -webkit-backdrop-filter: blur(32px) saturate(185%);
+      border-bottom: 1px solid var(--header-border);
+      color: var(--header-text);
+      padding: 9px 16px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      z-index: 20;
+      transition: all 0.22s ease;
+    }
+
+    @media (max-width: 1220px) {
+      header { display: flex; flex-wrap: wrap; justify-content: space-between; }
+      .brand-wrap { order: -1; width: 100%; justify-content: center; }
+    }
+
+    /* 手机端滑动时自动收缩上方功能表 */
+    @media (max-width: 900px) {
+      header {
+        padding: 6px 10px;
+        gap: 6px;
+      }
+      header.header-scrolled .header-left,
+      header.header-scrolled .brand-since,
+      header.header-scrolled #settings-btn {
+        display: none;
+      }
+      header.header-scrolled {
+        padding: 5px 10px;
+        flex-wrap: nowrap;
+        gap: 6px;
+      }
+      header.header-scrolled .brand-wrap {
+        order: 0;
+        width: auto;
+        justify-content: flex-start;
+        gap: 5px;
+      }
+      header.header-scrolled .brand-title {
+        font-size: 0.78rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 112px;
+      }
+      header.header-scrolled .header-right {
+        flex: 1;
+        justify-content: flex-end;
+        flex-wrap: nowrap;
+        gap: 4px;
+      }
+      header.header-scrolled .nav-tabs {
+        flex-wrap: nowrap;
+        gap: 3px;
+        overflow-x: auto;
+      }
+      header.header-scrolled .nav-tab {
+        padding: 4px 7px;
+        font-size: 0.74rem;
+        border-radius: 9px;
+      }
+      header.header-scrolled .nav-tab .icon-3d {
+        display: none;
+      }
+    }
+
+    .header-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-self: start; }
+    .brand-wrap { display: flex; align-items: center; justify-content: center; gap: 9px; user-select: none; text-align: center; justify-self: center; }
+    .brand-home-link { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; }
+    .wifi-led {
+      width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0;
+      border: 1.5px solid rgba(255, 255, 255, 0.78);
+    }
+    .wifi-led.online { background: #06b6d4; box-shadow: 0 0 8px rgba(6, 182, 212, 0.85); }
+    .wifi-led.offline { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.85); }
+    .brand-title, .brand-since {
+      font-family: var(--display-font); font-size: 1.02rem; font-weight: 700; letter-spacing: -0.02em; color: var(--header-text);
+    }
+    .header-right { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; justify-self: end; }
+    .live-clock {
+      font-family: "SF Mono", ui-monospace, monospace; font-size: 0.82rem; font-weight: 600;
+      background: var(--tbl-btn-bg); color: var(--text); padding: 6px 10px; border-radius: 12px; border: 1px solid var(--glass-border);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .glass-3d-btn, .nav-tab {
+      background: var(--tbl-btn-bg); color: var(--text); border: 1px solid var(--glass-border);
+      padding: 6px 11px; border-radius: 12px; font-size: 0.84rem; font-weight: 600;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .nav-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .nav-tab.active { background: linear-gradient(145deg, #3b82f6, var(--primary-deep)); color: #f8fafc; }
+    .badge { background: linear-gradient(145deg, #f43f5e, var(--danger)); color: #fff; border-radius: 99px; padding: 1px 7px; font-size: 0.74rem; }
+
+    .page { display: none; flex: 1; overflow: hidden; min-height: 0; }
+    .page.active { display: flex; }
+
+    .order-left { flex: 1; display: flex; flex-direction: column; padding: 12px; overflow: hidden; gap: 10px; min-width: 0; }
+    .order-right {
+      width: 400px; flex-shrink: 0; background: var(--notif-panel); backdrop-filter: blur(34px);
+      border-left: 1px solid var(--glass-border); display: flex; flex-direction: column;
+    }
+    @media (max-width: 900px) {
+      .page.active { flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      .order-left { overflow: visible; padding: 10px; }
+      .menu-container { overflow: visible !important; }
+      .order-right { width: 100%; flex-shrink: 1; border-left: none; border-top: 1px solid var(--glass-border); }
+    }
+
+    .table-bar {
+      background: var(--table-bar-bg); backdrop-filter: blur(28px);
+      border: 1px solid var(--glass-border); padding: 11px 14px; border-radius: 20px; box-shadow: var(--notif-shadow);
+    }
+    .table-bar-title { font-size: 0.88rem; color: var(--muted); font-weight: 500; margin-bottom: 8px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .table-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tbl-btn {
+      padding: 8px 14px; border: 1px solid var(--glass-border); background: var(--tbl-btn-bg);
+      border-radius: 14px; font-weight: 600; cursor: pointer; font-size: 0.92rem; min-height: 38px; color: var(--text);
+    }
+    .tbl-btn.selected { background: linear-gradient(145deg, #3b82f6, var(--primary-deep)); color: #f8fafc; }
+    .tbl-btn.takeaway.selected { background: linear-gradient(145deg, #eab308, var(--accent)); color: #fffbeb; }
+
+    .search-cat-bar { display: flex; flex-direction: column; gap: 8px; }
+    .search-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .search-box {
+      flex: 1; min-width: 180px; padding: 10px 14px; border: 1px solid var(--glass-border);
+      background: var(--input-bg); border-radius: 15px; font-size: 0.95rem; outline: none; color: var(--text);
+    }
+    .layout-toggle { display: flex; gap: 4px; background: var(--table-bar-bg); border: 1px solid var(--glass-border); padding: 3px; border-radius: 13px; }
+    .layout-btn { border: none; background: transparent; padding: 7px 11px; border-radius: 10px; font-size: 0.84rem; font-weight: 600; cursor: pointer; color: var(--muted); }
+    .layout-btn.active { background: var(--notif-card-hover); color: var(--text); }
+
+    .cat-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 3px; }
+    .cat-btn {
+      padding: 8px 15px; border: 1px solid var(--glass-border); background: var(--tbl-btn-bg);
+      color: var(--text); border-radius: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; font-size: 0.92rem;
+    }
+    .cat-btn.active { background: linear-gradient(145deg, #3b82f6, var(--primary-deep)); color: #f8fafc; }
+
+    .menu-container { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-right: 4px; min-height: 0; }
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 10px; align-content: start; }
+    .menu-column { display: flex; flex-direction: column; gap: 8px; }
+
+    .menu-card {
+      position: relative; background: var(--notif-card); backdrop-filter: blur(26px);
+      border: 1px solid var(--glass-border); border-radius: 18px; padding: 10px;
+      cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--notif-shadow);
+    }
+    .menu-card:active { transform: scale(0.97); }
+    .food-thumb { width: 100%; height: 105px; object-fit: cover; border-radius: 12px; margin-bottom: 8px; }
+    .food-thumb-placeholder {
+      width: 100%; height: 64px; border-radius: 12px; margin-bottom: 8px;
+      background: var(--tbl-btn-bg); color: var(--muted); display: flex; align-items: center; justify-content: center;
+      font-size: 0.76rem; font-weight: 600; border: 1px dashed var(--glass-border);
+    }
+    .menu-column .menu-card { flex-direction: row; align-items: center; gap: 12px; padding: 9px 12px; }
+    .menu-column .food-thumb, .menu-column .food-thumb-placeholder { width: 56px; height: 56px; margin-bottom: 0; flex-shrink: 0; }
+    .menu-column .item-info { flex: 1; min-width: 0; }
+    .menu-column .item-price { margin-top: 0; text-align: right; white-space: nowrap; }
+
+    .item-code {
+      font-size: 0.75rem; font-weight: 700; color: var(--text); background: var(--tbl-btn-hover);
+      border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: 8px; display: inline-block;
+    }
+    .item-name { font-weight: 600; font-size: 0.93rem; margin-top: 5px; line-height: 1.25; color: var(--text); }
+    .item-price { font-weight: 700; color: var(--price-color); font-size: 0.9rem; margin-top: 6px; }
+
+    .cart-header { padding: 12px 14px; border-bottom: 1px solid var(--glass-line); background: var(--tbl-btn-bg); display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .cart-table-label { font-weight: 700; font-size: 1rem; color: var(--text); }
+    .cart-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .cart-item { border: 1px solid var(--glass-border); border-radius: 16px; padding: 8px 10px; background: var(--notif-card); box-shadow: var(--notif-shadow); }
+    .cart-item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
+    .cart-item-name { font-weight: 600; font-size: 0.92rem; }
+    .cart-item-sub { font-size: 0.76rem; color: var(--accent); margin-top: 2px; }
+    .redeem-badge {
+      display: inline-block; background: rgba(16, 185, 129, 0.18); color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.45); border-radius: 7px; padding: 1px 6px; font-size: 0.74rem; font-weight: 700; margin-top: 3px;
+    }
+    .cart-item-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; align-items: center; }
+    .mini-btn {
+      border: 1px solid var(--glass-border); background: var(--tbl-btn-bg); color: var(--text);
+      padding: 4px 8px; border-radius: 9px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+    }
+    .mini-btn.active { background: rgba(217, 155, 56, 0.22); border-color: var(--accent); color: var(--accent); }
+    .mini-btn.del { background: rgba(239, 68, 68, 0.16); border-color: rgba(239, 68, 68, 0.42); color: #b91c1c; margin-left: auto; }
+    body.dark-mode .mini-btn.del { color: #fca5a5; }
+    .qty-box { display: flex; align-items: center; gap: 6px; }
+    .qty-btn { width: 24px; height: 24px; border: 1px solid var(--glass-border); background: var(--tbl-btn-bg); color: var(--text); border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .cart-footer { padding: 12px 14px; border-top: 1px solid var(--glass-line); background: var(--tbl-btn-bg); }
+    .total-row { display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
+    .btn-send {
+      width: 100%; padding: 11px; background: linear-gradient(145deg, #10b981, #059669);
+      color: #f8fafc; border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 14px; font-size: 0.96rem; font-weight: 700; cursor: pointer;
+    }
+
+    .full-page { flex: 1; padding: 16px; overflow-y: auto; -webkit-overflow-scrolling: touch; max-width: 1200px; margin: 0 auto; width: 100%; }
+    .toolbar-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+    .pos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 14px; }
+    .pos-column { display: flex; flex-direction: column; gap: 10px; }
+    .order-card { background: var(--notif-card); backdrop-filter: blur(26px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 14px; box-shadow: var(--notif-shadow); }
+    .pay-btns { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+    .pay-btn {
+      flex: 1; min-width: 76px; padding: 8px 9px; border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 12px; font-weight: 700; color: #f8fafc; cursor: pointer; font-size: 0.84rem;
+    }
+    .pay-cash { background: linear-gradient(145deg, #10b981, #047857); }
+    .pay-qr { background: linear-gradient(145deg, #3b82f6, #1d4ed8); }
+    .pay-edit { background: linear-gradient(145deg, #f59e0b, #b45309); }
+    .pay-print { background: linear-gradient(145deg, #64748b, #334155); }
+    .pay-del { background: linear-gradient(145deg, #ef4444, #b91c1c); }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .stat-card {
+      background: var(--notif-card); backdrop-filter: blur(26px); padding: 15px; border-radius: 20px;
+      border: 1px solid var(--glass-border); cursor: pointer; box-shadow: var(--notif-shadow);
+    }
+    .stat-card.active-period { border-color: var(--primary); }
+    .stat-title { font-size: 0.84rem; color: var(--muted); }
+    .stat-val { font-size: 1.4rem; font-weight: 700; margin-top: 6px; }
+
+    .scope-bar {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+      background: var(--notif-card); backdrop-filter: blur(24px); padding: 10px 14px;
+      border-radius: 18px; border: 1px solid var(--glass-border); margin-bottom: 14px; box-shadow: var(--notif-shadow);
+    }
+    .scope-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .scope-btn {
+      border: 1px solid var(--glass-border); background: var(--tbl-btn-bg); color: var(--text);
+      padding: 6px 12px; border-radius: 11px; font-size: 0.84rem; font-weight: 600; cursor: pointer;
+    }
+    .scope-btn.active { background: linear-gradient(145deg, #3b82f6, var(--primary-deep)); color: #f8fafc; }
+
+    .expense-form {
+      background: var(--notif-card); backdrop-filter: blur(24px); padding: 14px; border-radius: 20px;
+      border: 1px solid var(--glass-border); display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      margin-bottom: 18px; box-shadow: var(--notif-shadow);
+    }
+    .expense-form select, .expense-form input {
+      padding: 8px 12px; border: 1px solid var(--glass-border); background: var(--input-bg);
+      color: var(--text); border-radius: 12px; font-size: 0.9rem;
+    }
+
+    .history-card {
+      background: var(--notif-card); backdrop-filter: blur(24px); border: 1px solid var(--glass-border);
+      border-radius: 18px; padding: 12px 14px; margin-bottom: 10px; box-shadow: var(--notif-shadow);
+    }
+    .history-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; cursor: pointer; }
+    .history-detail { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--glass-line); display: none; font-size: 0.88rem; }
+    .history-detail.open { display: block; }
+
+    .modal-mask {
+      position: fixed; inset: 0; background: rgba(10, 15, 28, 0.42);
+      backdrop-filter: blur(14px); display: none; justify-content: center; align-items: center; z-index: 100; padding: 16px;
+    }
+    .modal-mask.show { display: flex; }
+    .modal-box {
+      background: var(--modal-bg); backdrop-filter: blur(36px); border: 1px solid var(--glass-border);
+      color: var(--text); border-radius: 24px; padding: 20px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto;
+    }
+    .setting-section { background: var(--tbl-btn-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px 14px; margin-bottom: 12px; }
+    .setting-section-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .setting-row-btns { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .printer-status-box { font-size: 0.83rem; color: var(--muted); line-height: 1.45; margin-top: 8px; padding: 8px 10px; border-radius: 11px; background: var(--input-bg); border: 1px solid var(--glass-line); }
+
+    .cash-modal-box { max-width: 540px; padding: 24px 24px 22px; border-radius: 26px; }
+    .cash-modal-title { font-size: 1.24rem; font-weight: 700; margin-bottom: 14px; }
+    .cash-summary-box { background: var(--tbl-btn-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; }
+    .cash-given-input { width: 100% !important; font-size: 1.25rem !important; font-weight: 700 !important; padding: 12px 14px !important; border-radius: 14px !important; }
+    .cash-change-preview { font-size: 1.28rem; font-weight: 700; color: var(--price-color); margin-top: 10px; min-height: 34px; }
+    .cash-action-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+    @media (max-width: 520px) { .cash-action-row { grid-template-columns: 1fr; } }
+    .cash-big-btn {
+      padding: 14px 12px; border-radius: 15px; font-size: 0.98rem; font-weight: 700;
+      cursor: pointer; min-height: 54px; display: flex; align-items: center; justify-content: center; text-align: center;
+    }
+    .cash-cancel-red { background: linear-gradient(145deg, #ef4444, #b91c1c); color: #f8fafc; border: 1px solid rgba(255, 255, 255, 0.35); }
+    .cash-exact-green { background: linear-gradient(145deg, #10b981, #047857); color: #f8fafc; border: 1px solid rgba(255, 255, 255, 0.35); }
+    .cash-confirm-blue { background: linear-gradient(145deg, #3b82f6, #1d4ed8); color: #f8fafc; border: 1px solid rgba(255, 255, 255, 0.35); }
+
+    .modal-title { font-weight: 700; font-size: 1.06rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .modal-msg { font-size: 0.94rem; line-height: 1.5; color: var(--muted); margin-bottom: 14px; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .tag-btn { padding: 7px 12px; border: 1px solid var(--glass-border); background: var(--tbl-btn-bg); color: var(--text); border-radius: 11px; cursor: pointer; font-weight: 600; }
+    .tag-btn.active { background: linear-gradient(145deg, #3b82f6, var(--primary-deep)); color: #f8fafc; }
+
+    .mgr-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 12px; }
+    .mgr-item-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+      background: var(--notif-card); border: 1px solid var(--glass-border); border-radius: 16px; padding: 10px 12px; margin-bottom: 8px;
+    }
+    .mgr-thumb {
+      width: 52px; height: 52px; border-radius: 10px; object-fit: cover;
+      background: var(--tbl-btn-bg); border: 1px solid var(--glass-border);
+      display: flex; align-items: center; justify-content: center; font-size: 0.72rem; color: var(--muted); flex-shrink: 0;
+    }
+
+    /* A4 结账单：加高加宽签名与写明栏 */
+    .a4-page-block {
+      page-break-after: always;
+      break-after: page;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      color: #000;
+    }
+    .a4-page-block:last-child { page-break-after: auto; break-after: auto; }
+    .a4-summary-table { width: 100%; border-collapse: collapse; font-size: 10pt; line-height: 1.3; margin-bottom: 8px; }
+    .a4-summary-table td { border: 0.75pt solid #444; padding: 4px 6px; vertical-align: middle; }
+    .a4-compact-table { width: 100%; border-collapse: collapse; font-size: 8.8pt; line-height: 1.25; margin-bottom: 14px; }
+    .a4-compact-table th, .a4-compact-table td { border: 0.6pt solid #555; padding: 2.5px 5px; vertical-align: middle; }
+    .a4-compact-table th { background: #f3f4f6; font-weight: 700; }
+    .a4-sign-footer {
+      font-size: 9pt;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 0.8pt solid #333;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .a4-sign-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+    .a4-sign-box { flex: 1; }
+    .a4-sign-line {
+      border-bottom: 0.85pt solid #222;
+      height: 42px;
+      margin-top: 6px;
+    }
+    .a4-notes-box {
+      border: 0.75pt solid #444;
+      padding: 8px 10px;
+      min-height: 76px;
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .a4-write-line {
+      border-bottom: 0.5pt dashed #999;
+      height: 22px;
+      width: 100%;
+    }
+
+    @media print {
+      body > * { display: none !important; }
+      #print-area { display: block !important; color: #000 !important; background: #fff !important; }
+      body.print-a4 { @page { size: A4 portrait; margin: 6mm; } }
+      body.print-a4 #print-area { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+      body:not(.print-a4) { @page { size: 57mm auto; margin: 1.5mm; } }
+      body:not(.print-a4) #print-area { width: 54mm !important; margin: 0 !important; padding: 0 !important; }
+    }
+    /* iOS 级 GPU 硬件加速与渲染优化 */
+:root {
+  --ios-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --ios-snappy: cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.menu-card,
+.order-card,
+.history-card,
+.stat-card {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--notif-card);
+  contain: layout style paint;
+  transform: translateZ(0);
+  transition: transform 0.16s var(--ios-snappy), background-color 0.18s ease;
+}
+
+body:not(.dark-mode) .menu-card,
+body:not(.dark-mode) .order-card,
+body:not(.dark-mode) .history-card,
+body:not(.dark-mode) .stat-card {
+  background: rgba(255, 255, 255, 0.78);
+}
+
+body.dark-mode .menu-card,
+body.dark-mode .order-card,
+body.dark-mode .history-card,
+body.dark-mode .stat-card {
+  background: rgba(30, 35, 46, 0.84);
+}
+
+.menu-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 165px;
+}
+
+.menu-column .menu-card {
+  contain-intrinsic-size: 74px;
+}
+
+.history-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 78px;
+}
+
+.tbl-btn,
+.cat-btn,
+.mini-btn,
+.qty-btn,
+.pay-btn,
+.glass-3d-btn,
+.nav-tab,
+.layout-btn,
+.scope-btn,
+.tag-btn,
+.cash-big-btn,
+.btn-send {
+  transition: transform 0.14s var(--ios-snappy), background-color 0.16s ease, opacity 0.16s ease;
+}
+
+.tbl-btn:active,
+.cat-btn:active,
+.mini-btn:active,
+.qty-btn:active,
+.pay-btn:active,
+.glass-3d-btn:active,
+.nav-tab:active,
+.layout-btn:active,
+.scope-btn:active,
+.tag-btn:active,
+.cash-big-btn:active,
+.btn-send:active {
+  transform: scale(0.95);
+}
+
+.modal-mask {
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  opacity: 0;
+  transition: opacity 0.2s var(--ios-spring);
+}
+
+.modal-mask.show {
+  opacity: 1;
+}
+
+.modal-box {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transform: translate3d(0, 14px, 0) scale(0.97);
+  transition: transform 0.24s var(--ios-spring);
+}
+
+body:not(.dark-mode) .modal-box {
+  background: rgba(255, 255, 255, 0.96);
+}
+
+body.dark-mode .modal-box {
+  background: rgba(26, 30, 40, 0.97);
+}
+
+.modal-mask.show .modal-box {
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.page.active {
+  animation: iosPageFadeIn 0.2s var(--ios-spring);
+}
+
+@keyframes iosPageFadeIn {
+  from { opacity: 0.72; transform: translate3d(0, 4px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+.menu-container,
+.cart-list,
+.full-page,
+.cat-tabs {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* iOS 风格平滑收缩顶栏（仅针对顶栏容器本身，避免通配符全量重排） */
+#main-header {
+  transition: padding 0.26s var(--ios-spring), background-color 0.22s ease;
+  will-change: padding;
+}
+
+@media (max-width: 768px) {
+  #page-order.page.active {
+    padding-bottom: 84px;
+  }
+
+  #mobile-sticky-order-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 95;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(15, 23, 42, 0.1);
+    box-shadow: 0 -6px 22px rgba(15, 23, 42, 0.1);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  body.dark #mobile-sticky-order-bar {
+    background: rgba(20, 26, 38, 0.94);
+    border-top-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 -6px 22px rgba(0, 0, 0, 0.38);
+  }
+
+  #mobile-sticky-order-bar .m-sticky-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+  }
+
+  #mobile-sticky-order-bar .m-sticky-sub {
+    font-size: 12px;
+    opacity: 0.78;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #mobile-sticky-order-bar .m-sticky-total {
+    font-size: 15px;
+    font-weight: 800;
+    color: #059669;
+    white-space: nowrap;
+  }
+
+  #mobile-sticky-order-bar .m-sticky-btn {
+    flex-shrink: 0;
+    border: none;
+    border-radius: 12px;
+    padding: 11px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    background: #10b981;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.28);
+    cursor: pointer;
+    transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+  }
+
+  #mobile-sticky-order-bar .m-sticky-btn:active {
+    transform: scale(0.96);
+  }
+}
+
+@media (min-width: 769px) {
+  #mobile-sticky-order-bar {
+    display: none !important;
+  }
+}
+  </style>
+</head>
+<body>
+
+<div id="app-zoom-shell">
+  <header id="main-header">
+    <div class="header-left">
+      <div class="live-clock" id="live-clock">
+        <span class="icon-3d icon-3d-blue">🕒</span>
+        <span id="clock-text">20-Nov-2026 12:15 AM</span>
+      </div>
+      <button class="glass-3d-btn" id="theme-toggle-btn" onclick="triggerHaptic(); toggleTheme();">
+        <span class="icon-3d icon-3d-amber" id="theme-icon">🌙</span>
+        <span id="theme-label">Dark</span>
+      </button>
+    </div>
+
+    <div class="brand-wrap">
+      <span class="wifi-led online" id="wifi-status-led" title="Online / Offline"></span>
+      <div class="brand-home-link" onclick="triggerHaptic(); goHomeOrderPage();">
+        <span class="brand-title">Rainbow Ice Parlour & Coffee House</span>
+        <span class="brand-since">Since 1991</span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="nav-tabs">
+        <button class="nav-tab active" id="tab-order" onclick="triggerHaptic(); switchPage('order', this);"></button>
+        <button class="nav-tab" id="tab-pos" onclick="triggerHaptic(); switchPage('pos', this);"></button>
+        <button class="nav-tab" id="tab-account" onclick="triggerHaptic(); switchPage('account', this);"></button>
+        <button class="nav-tab" id="tab-menu" onclick="triggerHaptic(); switchPage('menu', this);"></button>
+      </div>
+      <button class="glass-3d-btn" id="settings-btn" onclick="triggerHaptic(); openSettingsModal();">
+        <span class="icon-3d icon-3d-blue">⚙️</span>
+        <span id="settings-btn-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 第1页：点餐下单 -->
+  <div id="page-order" class="page active">
+    <div class="order-left">
+      <div class="table-bar">
+        <div class="table-bar-title">
+          <span id="table-bar-hint-prefix"></span>
+          <span style="color:var(--text);font-weight:700;" id="selected-table-hint"></span>
+        </div>
+        <div class="table-grid" id="table-grid"></div>
+      </div>
+
+      <div class="search-cat-bar">
+        <div class="search-row">
+          <input type="text" id="search-input" class="search-box" oninput="debouncedRenderMenu()" />
+          <div class="layout-toggle">
+            <button class="layout-btn active" id="btn-menu-grid" onclick="triggerHaptic(); setMenuLayout('grid');"></button>
+            <button class="layout-btn" id="btn-menu-col" onclick="triggerHaptic(); setMenuLayout('column');"></button>
+          </div>
+        </div>
+        <div class="cat-tabs" id="cat-tabs"></div>
+      </div>
+
+      <div class="menu-container" id="menu-scroll-container">
+        <div class="menu-grid" id="menu-grid"></div>
+      </div>
+    </div>
+
+    <div class="order-right">
+      <div class="cart-header">
+        <div>
+          <div style="font-size:0.75rem;color:var(--muted);" id="cart-sub-label"></div>
+          <div class="cart-table-label" id="cart-table-display"></div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="mini-btn" id="btn-custom-item" onclick="triggerHaptic(); openCustomItemModal();"></button>
+          <button class="mini-btn del" style="margin-left:0;" id="btn-clear-cart" onclick="triggerHaptic(); clearCart();"></button>
+        </div>
+      </div>
+      <div class="cart-list" id="cart-list"></div>
+      <div class="cart-footer">
+        <div class="total-row">
+          <span id="cart-total-label"></span>
+          <span id="cart-total">RM 0.00</span>
+        </div>
+        <button class="btn-send" id="btn-send-order" onclick="triggerHaptic(); submitOrder();"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 第2页：收银台 -->
+  <div id="page-pos" class="page">
+    <div class="full-page" id="pos-scroll-container">
+      <div class="toolbar-row">
+        <h2 style="margin:0;font-family:var(--display-font);letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;">
+          <span class="icon-3d icon-3d-blue">💳</span>
+          <span id="pos-page-title"></span>
+        </h2>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <select id="pos-sort" onchange="renderPOS()" style="padding:7px 10px;border-radius:12px;border:1px solid var(--glass-border);background:var(--input-bg);color:var(--text);font-weight:600;"></select>
+          <div class="layout-toggle">
+            <button class="layout-btn active" id="btn-pos-grid" onclick="triggerHaptic(); setPosLayout('grid');"></button>
+            <button class="layout-btn" id="btn-pos-col" onclick="triggerHaptic(); setPosLayout('column');"></button>
+          </div>
+        </div>
+      </div>
+      <div class="pos-grid" id="pos-orders-grid"></div>
+    </div>
+  </div>
+
+  <!-- 第3页：收支记账 -->
+  <div id="page-account" class="page">
+    <div class="full-page" id="account-scroll-container">
+      <div class="toolbar-row">
+        <h2 style="margin:0;font-family:var(--display-font);letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;">
+          <span class="icon-3d icon-3d-green">📊</span>
+          <span id="acc-page-title"></span>
+        </h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <label style="font-size:0.84rem;font-weight:600;color:var(--muted);" id="biz-day-label"></label>
+          <input type="date" id="biz-day-input" onchange="onBizDayChange()" style="padding:6px 10px;border-radius:11px;border:1px solid var(--glass-border);background:var(--input-bg);color:var(--text);font-weight:600;" />
+          <label style="font-size:0.84rem;font-weight:600;color:var(--muted);" id="biz-month-label"></label>
+          <input type="month" id="biz-month-input" onchange="onBizMonthChange()" style="padding:6px 10px;border-radius:11px;border:1px solid var(--glass-border);background:var(--input-bg);color:var(--text);font-weight:600;" />
+          <button class="pay-btn pay-qr" style="flex:0 0 auto;padding:8px 13px;" id="btn-print-daily" onclick="triggerHaptic(); printDailyClosingA4();"></button>
+          <button class="pay-btn pay-cash" style="flex:0 0 auto;padding:8px 13px;" id="btn-print-monthly" onclick="triggerHaptic(); printMonthlyClosingA4();"></button>
+        </div>
+      </div>
+
+      <div class="stats-grid" id="stats-grid"></div>
+
+      <div class="scope-bar">
+        <div style="font-weight:600;" id="history-scope-label"></div>
+        <div class="scope-btns">
+          <button class="scope-btn active" id="scope-day" onclick="triggerHaptic(); setHistoryScope('day');"></button>
+          <button class="scope-btn" id="scope-month" onclick="triggerHaptic(); setHistoryScope('month');"></button>
+          <button class="scope-btn" id="scope-year" onclick="triggerHaptic(); setHistoryScope('year');"></button>
+        </div>
+      </div>
+
+      <h3 style="margin-top:14px;" id="platform-order-title"></h3>
+      <div class="expense-form" style="margin-bottom:16px;">
+        <select id="platform-order-type">
+          <option value="Foodpanda">Foodpanda</option>
+          <option value="Grabfood">Grabfood</option>
+        </select>
+        <input type="text" id="platform-order-ref" style="flex:1;min-width:160px;" />
+        <input type="number" id="platform-order-amt" step="0.1" min="0" />
+        <button class="pay-btn pay-qr" style="flex:0 0 auto;padding:9px 16px;" id="btn-add-platform" onclick="triggerHaptic(); addPlatformOrder();"></button>
+      </div>
+
+      <h3 id="paid-hist-title"></h3>
+      <div id="paid-history-list"></div>
+
+      <h3 style="margin-top:20px;" id="add-exp-title"></h3>
+      <div class="expense-form">
+        <select id="exp-cat"></select>
+        <input type="number" id="exp-amount" step="0.1" />
+        <input type="text" id="exp-note" style="flex:1;min-width:160px;" />
+        <button class="pay-btn pay-cash" style="flex:0 0 auto;padding:9px 18px;" id="btn-save-exp" onclick="triggerHaptic(); addExpense();"></button>
+      </div>
+
+      <h3 id="exp-hist-title"></h3>
+      <div id="expense-list"></div>
+    </div>
+  </div>
+
+  <!-- 第4页：菜单管理 -->
+  <div id="page-menu" class="page">
+    <div class="full-page" id="menu-mgr-scroll-container">
+      <div class="toolbar-row">
+        <h2 style="margin:0;font-family:var(--display-font);letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;">
+          <span class="icon-3d icon-3d-amber">🍜</span>
+          <span id="menu-mgr-title"></span>
+        </h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <span style="font-size:0.78rem;color:var(--price-color);font-weight:600;" id="auto-sync-hint"></span>
+          <button class="mini-btn" style="padding:7px 12px;" id="btn-export-sync" onclick="triggerHaptic(); exportMenuSyncFile();"></button>
+          <label class="mini-btn" style="padding:7px 12px;cursor:pointer;" id="btn-import-sync-label">
+            <span id="btn-import-sync"></span>
+            <input type="file" id="import-sync-input" accept=".json,application/json" style="display:none;" onchange="importMenuSyncFile(event)" />
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-section">
+        <div class="setting-section-title">
+          <span class="icon-3d icon-3d-green">➕</span>
+          <span id="add-new-dish-title"></span>
+        </div>
+        <div class="mgr-form-grid">
+          <input type="text" id="new-dish-code" class="search-box" />
+          <select id="new-dish-cat" class="search-box"></select>
+          <input type="text" id="new-dish-cn" class="search-box" />
+          <input type="text" id="new-dish-en" class="search-box" />
+          <input type="number" id="new-dish-price" class="search-box" step="0.1" />
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <label class="mini-btn" style="padding:7px 12px;cursor:pointer;">
+            <span id="new-dish-photo-btn"></span>
+            <input type="file" id="new-dish-photo-input" accept="image/*" style="display:none;" onchange="handleNewDishPhoto(event)" />
+          </label>
+          <span id="new-dish-photo-status" style="font-size:0.8rem;color:var(--muted);"></span>
+          <button type="button" class="pay-btn pay-cash" style="flex:0 0 auto;padding:8px 16px;margin-left:auto;" id="btn-create-dish" onclick="triggerHaptic(); createNewDish();"></button>
+        </div>
+      </div>
+
+      <div class="search-row" style="margin-bottom:12px;">
+        <input type="text" id="mgr-search-input" class="search-box" oninput="debouncedRenderMenuManager()" />
+      </div>
+
+      <div id="menu-mgr-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 设置弹窗 -->
+<div class="modal-mask" id="settings-modal">
+  <div class="modal-box">
+    <div class="modal-title">
+      <span class="icon-3d icon-3d-blue">⚙️</span>
+      <span id="settings-modal-title"></span>
+    </div>
+
+    <div class="setting-section">
+      <div class="setting-section-title">
+        <span class="icon-3d icon-3d-green">📶</span>
+        <span id="set-wifi-title"></span>
+      </div>
+      <div class="printer-status-box" id="settings-wifi-detail" style="margin-top:0;"></div>
+    </div>
+
+    <div class="setting-section">
+      <div class="setting-section-title">
+        <span class="icon-3d icon-3d-amber">🌐</span>
+        <span id="set-lang-title"></span>
+      </div>
+      <div class="setting-row-btns">
+        <button type="button" class="tag-btn" id="btn-lang-zh" onclick="triggerHaptic(); setLanguage('zh');">中文 (简体)</button>
+        <button type="button" class="tag-btn" id="btn-lang-en" onclick="triggerHaptic(); setLanguage('en');">English</button>
+      </div>
+    </div>
+
+    <div class="setting-section">
+      <div class="setting-section-title">
+        <span class="icon-3d icon-3d-green">🔍</span>
+        <span id="set-zoom-title"></span>
+      </div>
+      <div class="setting-row-btns">
+        <button type="button" class="mini-btn" style="padding:7px 12px;font-size:0.9rem;" onclick="triggerHaptic(); changeZoom(-10);">-</button>
+        <span id="set-zoom-val" style="font-weight:700;min-width:54px;text-align:center;">100%</span>
+        <button type="button" class="mini-btn" style="padding:7px 12px;font-size:0.9rem;" onclick="triggerHaptic(); changeZoom(10);">+</button>
+        <button type="button" class="mini-btn" style="padding:7px 11px;" id="btn-zoom-reset" onclick="triggerHaptic(); resetZoom();"></button>
+      </div>
+    </div>
+
+    <div class="setting-section">
+      <div class="setting-section-title">
+        <span class="icon-3d icon-3d-blue">📳</span>
+        <span id="set-haptic-title"></span>
+      </div>
+      <div class="setting-row-btns">
+        <button type="button" class="tag-btn active" id="btn-haptic-toggle" onclick="toggleHapticSetting()"></button>
+      </div>
+    </div>
+
+    <div class="setting-section">
+      <div class="setting-section-title">
+        <span class="icon-3d icon-3d-blue">🖨️</span>
+        <span id="set-printer-title"></span>
+      </div>
+      <div class="setting-row-btns">
+        <button type="button" class="mini-btn" style="padding:7px 12px;" id="btn-check-printer" onclick="triggerHaptic(); checkPrinterStatus();"></button>
+        <button type="button" class="mini-btn" style="padding:7px 12px;" id="btn-test-print" onclick="triggerHaptic(); testPrintSample();"></button>
+      </div>
+      <div class="printer-status-box" id="printer-status-text"></div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+      <button type="button" class="mini-btn" style="background:var(--primary);color:#f8fafc;padding:8px 16px;" id="settings-close-btn" onclick="closeModal('settings-modal')"></button>
+    </div>
+  </div>
+</div>
+
+<!-- 修改已结账单据弹窗 -->
+<div class="modal-mask" id="edit-paid-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="edit-paid-modal-title"></div>
+    <div style="margin-bottom:10px;">
+      <label id="edit-paid-date-label" style="display:block;font-weight:600;margin-bottom:4px;"></label>
+      <input type="date" id="edit-paid-date" class="search-box" style="font-size:0.92rem;padding:8px 10px;" />
+    </div>
+    <div style="margin-bottom:10px;">
+      <label id="edit-paid-pay-label" style="display:block;font-weight:600;margin-bottom:4px;"></label>
+      <select id="edit-paid-pay" class="search-box" style="font-size:0.92rem;padding:8px 10px;">
+        <option value="Cash">Cash</option>
+        <option value="DuitNow QR">DuitNow QR</option>
+      </select>
+    </div>
+    <div style="margin-bottom:14px;">
+      <label id="edit-paid-total-label" style="display:block;font-weight:600;margin-bottom:4px;"></label>
+      <input type="number" id="edit-paid-total" class="search-box" style="font-size:0.92rem;padding:8px 10px;" step="0.01" min="0" />
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button type="button" class="mini-btn" id="edit-paid-cancel-btn" onclick="closeModal('edit-paid-modal')"></button>
+      <button type="button" class="mini-btn" style="background:var(--primary);color:#f8fafc;" id="edit-paid-save-btn" onclick="saveEditedPaidOrder()"></button>
+    </div>
+  </div>
+</div>
+
+<!-- 修改支出弹窗 -->
+<div class="modal-mask" id="edit-exp-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="edit-exp-modal-title"></div>
+    <div style="margin-bottom:10px;">
+      <label id="edit-exp-cat-label" style="display:block;font-weight:600;margin-bottom:4px;"></label>
+      <select id="edit-exp-cat" class="search-box" style="font-size:0.92rem;padding:8px 10px;"></select>
+    </div>
+    <div style="margin-bottom:10px;">
+      <label id="edit-exp-date-label" style="display:block;font-weight:600;margin-bottom:4px;"></label>
+      <input type="date" id="edit-exp-date" class="search-box" style="font-size:0.92rem;padding:8px 10px;" />
+    </div>
+    <div style="margin-bottom:10px;">
+      <label id="edit-exp-amt-label" style="display:block;font-weight:600;margin-bottom:4px;"></label>
+      <input type="number" id="edit-exp-amount" class="search-box" style="font-size:0.92rem;padding:8px 10px;" step="0.1" min="0" />
+    </div>
+    <div style="margin-bottom:14px;">
+      <label id="edit-exp-note-label" style="display:block;font-weight:600;margin-bottom:4px;"></label>
+      <input type="text" id="edit-exp-note" class="search-box" style="font-size:0.92rem;padding:8px 10px;" />
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button type="button" class="mini-btn" id="edit-exp-cancel-btn" onclick="closeModal('edit-exp-modal')"></button>
+      <button type="button" class="mini-btn" style="background:var(--primary);color:#f8fafc;" id="edit-exp-save-btn" onclick="saveEditedExpense()"></button>
+    </div>
+  </div>
+</div>
+
+<!-- 现金结账与找零弹窗 -->
+<div class="modal-mask" id="cash-modal">
+  <div class="modal-box cash-modal-box">
+    <div class="cash-modal-title" id="cash-modal-title"></div>
+    <div class="cash-summary-box">
+      <div style="display:flex;justify-content:space-between;font-size:1.05rem;">
+        <span id="cash-table-label"></span>
+        <b id="cash-table-val"></b>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:1.18rem;margin-top:8px;">
+        <span id="cash-due-label"></span>
+        <b style="color:var(--price-color);" id="cash-due-val">RM 0.00</b>
+      </div>
+    </div>
+
+    <div style="margin-bottom:10px;">
+      <label id="cash-given-label" style="display:block;font-weight:600;font-size:1rem;margin-bottom:8px;"></label>
+      <input type="number" id="cash-given-input" class="search-box cash-given-input" step="0.1" oninput="updateCashChangePreview()" />
+    </div>
+
+    <div class="cash-change-preview" id="cash-change-preview"></div>
+
+    <div class="cash-action-row">
+      <button type="button" class="cash-big-btn cash-cancel-red" id="cash-cancel-btn" onclick="cancelCashModal()"></button>
+      <button type="button" class="cash-big-btn cash-exact-green" id="cash-exact-btn" onclick="confirmExactCash()"></button>
+      <button type="button" class="cash-big-btn cash-confirm-blue" id="cash-confirm-btn" onclick="confirmCustomCash()"></button>
+    </div>
+  </div>
+</div>
+
+<!-- 改价 / 改名 / 选项 / 临时项目 / 备注 / 提示弹窗 -->
+<div class="modal-mask" id="edit-price-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="edit-price-modal-title"></div>
+    <div style="margin-bottom:12px;">
+      <label id="edit-price-label" style="display:block;font-weight:600;margin-bottom:6px;"></label>
+      <input type="number" id="edit-price-input" class="search-box" step="0.1" min="0" />
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button type="button" class="mini-btn" id="edit-price-cancel-btn" onclick="closeModal('edit-price-modal')"></button>
+      <button type="button" class="mini-btn" style="background:var(--primary);color:#f8fafc;" id="edit-price-save-btn" onclick="saveEditedItemPrice()"></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="edit-name-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="edit-name-modal-title"></div>
+    <div style="margin-bottom:10px;">
+      <label id="edit-cn-label" style="display:block;font-weight:600;margin-bottom:4px;"></label>
+      <input type="text" id="edit-item-cn" class="search-box" style="font-size:0.92rem;padding:8px 10px;" />
+    </div>
+    <div style="margin-bottom:12px;">
+      <label id="edit-en-label" style="display:block;font-weight:600;margin-bottom:4px;"></label>
+      <input type="text" id="edit-item-en" class="search-box" style="font-size:0.92rem;padding:8px 10px;" />
+    </div>
+    <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+      <button type="button" class="mini-btn" id="reset-single-name-btn" onclick="resetSingleItemName()"></button>
+      <div style="display:flex;gap:8px;">
+        <button type="button" class="mini-btn" id="edit-name-cancel-btn" onclick="closeModal('edit-name-modal')"></button>
+        <button type="button" class="mini-btn" style="background:var(--primary);color:#f8fafc;" id="edit-name-save-btn" onclick="saveEditedItemName()"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="option-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="opt-modal-title"></div>
+    <div id="opt-modal-body"></div>
+    <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end;">
+      <button class="mini-btn" id="opt-cancel-btn" onclick="closeModal('option-modal')"></button>
+      <button class="mini-btn" style="background:var(--primary);color:#f8fafc;" id="opt-confirm-btn"></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="custom-item-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="custom-modal-title"></div>
+    <div style="margin-bottom:10px;">
+      <label id="custom-name-label" style="display:block;font-weight:600;margin-bottom:4px;"></label>
+      <input type="text" id="custom-item-name" class="search-box" style="font-size:0.92rem;padding:8px 10px;" />
+    </div>
+    <div style="margin-bottom:10px;">
+      <label id="custom-price-label" style="display:block;font-weight:600;margin-bottom:4px;"></label>
+      <input type="number" id="custom-item-price" class="search-box" style="font-size:0.92rem;padding:8px 10px;" step="0.1" />
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end;">
+      <button class="mini-btn" id="custom-cancel-btn" onclick="closeModal('custom-item-modal')"></button>
+      <button class="mini-btn" style="background:var(--primary);color:#f8fafc;" id="custom-confirm-btn" onclick="addCustomItemToCart()"></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="remark-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="remark-modal-title"></div>
+    <div class="tag-list" id="remark-tags"></div>
+    <input type="text" id="remark-custom" class="search-box" style="font-size:0.9rem;padding:8px 10px;" />
+    <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end;">
+      <button class="mini-btn" id="remark-cancel-btn" onclick="closeModal('remark-modal')"></button>
+      <button class="mini-btn" style="background:var(--primary);color:#f8fafc;" id="remark-confirm-btn" onclick="saveRemark()"></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="ui-dialog-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="ui-dialog-title"></div>
+    <div class="modal-msg" id="ui-dialog-msg"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;" id="ui-dialog-actions"></div>
+  </div>
+</div>
+
+<div id="print-area" style="display:none;"></div>
+
+<script>
+let lang = 'zh';
+let themeMode = localStorage.getItem('rainbow_theme_mode') || 'light';
+let uiZoom = parseInt(localStorage.getItem('rainbow_ui_zoom') || '100', 10);
+let hapticEnabled = localStorage.getItem('rainbow_haptic_enabled') !== 'off';
+let pendingCashOrderIdx = -1;
+let editingNameCode = null;
+let editingPriceCode = null;
+let editingActiveOrderIdx = -1;
+let editingOrderBizDate = null;
+let editingExpenseIdx = -1;
+let editingPaidOrderIdx = -1;
+let newDishPhotoDataUrl = '';
+
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function setupPwaSupport() {
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#007aff';
+    ctx.fillRect(0, 0, 512, 512);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 170px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('POS', 256, 265);
+    const iconPng = canvas.toDataURL('image/png');
+
+    const manifest = {
+      name: 'Rainbow Ice Parlour & Coffee House POS',
+      short_name: 'Rainbow POS',
+      start_url: './',
+      scope: './',
+      display: 'standalone',
+      background_color: '#e8eff8',
+      theme_color: '#007aff',
+      icons: [
+        { src: iconPng, sizes: '192x192', type: 'image/png' },
+        { src: iconPng, sizes: '512x512', type: 'image/png' }
+      ]
+    };
+    const mBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+    const mUrl = URL.createObjectURL(mBlob);
+    const linkEl = document.getElementById('pwa-manifest-link');
+    if (linkEl) linkEl.href = mUrl;
+
+    if ('serviceWorker' in navigator && window.isSecureContext) {
+      const swCode = `
+        self.addEventListener('install', e => self.skipWaiting());
+        self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+        self.addEventListener('fetch', event => {
+          event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
+        });
+      `;
+      const swBlob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(swBlob);
+      navigator.serviceWorker.register(swUrl, { scope: './' }).catch(() => {});
+    }
+  } catch (e) {}
+}
+
+function setupScrollAutoCollapseHeader() {
+  const header = document.getElementById('main-header');
+  if (!header) return;
+  const scrollEls = [
+    document.getElementById('page-order'),
+    document.getElementById('menu-scroll-container'),
+    document.getElementById('pos-scroll-container'),
+    document.getElementById('account-scroll-container'),
+    document.getElementById('menu-mgr-scroll-container')
+  ].filter(Boolean);
+
+  let ticking = false;
+  let isCollapsed = false;
+
+  const evaluateScroll = () => {
+    ticking = false;
+    if (window.innerWidth > 900) {
+      if (isCollapsed) {
+        isCollapsed = false;
+        header.classList.remove('header-scrolled');
+      }
+      return;
+    }
+    let maxScroll = window.scrollY || document.documentElement.scrollTop || 0;
+    for (let i = 0; i < scrollEls.length; i++) {
+      const st = scrollEls[i].scrollTop || 0;
+      if (st > maxScroll) maxScroll = st;
+    }
+    // 迟滞阈值防止临界点抖动
+    if (!isCollapsed && maxScroll > 56) {
+      isCollapsed = true;
+      header.classList.add('header-scrolled');
+    } else if (isCollapsed && maxScroll < 20) {
+      isCollapsed = false;
+      header.classList.remove('header-scrolled');
+    }
+  };
+
+  const onScroll = () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(evaluateScroll);
+    }
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  scrollEls.forEach(el => el.addEventListener('scroll', onScroll, { passive: true }));
+  window.addEventListener('resize', onScroll, { passive: true });
+}
+
+function formatDashDate(dateInput) {
+  let d;
+  if (!dateInput) {
+    d = new Date();
+  } else if (typeof dateInput === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
+    const [y, m, day] = dateInput.split('-').map(Number);
+    d = new Date(y, m - 1, day);
+  } else {
+    d = new Date(dateInput);
+  }
+  if (isNaN(d.getTime())) return String(dateInput || '');
+  const dayStr = String(d.getDate()).padStart(2, '0');
+  const monStr = MONTHS_SHORT[d.getMonth()];
+  return `${dayStr}-${monStr}-${d.getFullYear()}`;
+}
+
+function formatSpaceDate(dateInput) {
+  return formatDashDate(dateInput).replace(/-/g, ' ');
+}
+
+function formatPrinted12h(d = new Date()) {
+  const dayStr = String(d.getDate()).padStart(2, '0');
+  const monStr = MONTHS_SHORT[d.getMonth()];
+  let hr = d.getHours();
+  const min = String(d.getMinutes()).padStart(2, '0');
+  const ampm = hr >= 12 ? 'PM' : 'AM';
+  hr = hr % 12;
+  if (hr === 0) hr = 12;
+  return `${dayStr}-${monStr}-${d.getFullYear()} ${String(hr).padStart(2, '0')}:${min} ${ampm}`;
+}
+
+const syncChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('rainbow_pos_sync_v1') : null;
+function broadcastMenuUpdate() {
+  try { if (syncChannel) syncChannel.postMessage({ type: 'menu_updated', at: Date.now() }); } catch (e) {}
+}
+if (syncChannel) {
+  syncChannel.onmessage = (ev) => {
+    if (ev && ev.data && ev.data.type === 'menu_updated') {
+      customMenuOverrides = JSON.parse(localStorage.getItem('rainbow_menu_overrides') || '{}');
+      extraMenuItems = JSON.parse(localStorage.getItem('rainbow_extra_menu_items') || '[]');
+      invalidateMenuCache();
+      renderMenu();
+      renderMenuManager();
+    }
+  };
+}
+
+const BASE_MENU = [
+  { code: 'P1', cat: '西餐', cn: '番茄肉酱意粉', en: 'Pasta Chicken Bolognese', price: 16, addon: { zh: '加牛肉', en: 'Add Beef', price: 2 }, img: '' },
+  { code: 'P2', cat: '西餐', cn: '忌廉蘑菇意粉', en: 'Creamy Mushroom Pasta', price: 16, img: '' },
+  { code: 'P3', cat: '西餐', cn: '冬炎海鲜意粉', en: 'Tom Yam Seafood Pasta', price: 18, img: '' },
+  { code: 'P4', cat: '西餐', cn: '忌廉芝士海鲜意粉', en: 'Creamy Butter Cheesy Seafood Pasta', price: 18, img: '' },
+  { code: 'P5', cat: '西餐', cn: '黑椒牛柳意粉', en: 'Black Pepper Beef Pasta', price: 18, img: '' },
+  { code: 'P6', cat: '西餐', cn: '香蒜熏鸭意粉', en: 'Smoked Duck Aglio Olio', price: 18, img: '' },
+  { code: 'W1', cat: '西餐', cn: '铁板黑椒煎鸡扒', en: 'Sizzling Chicken Chop Black Pepper', price: 18, img: '' },
+  { code: 'W2', cat: '西餐', cn: '铁板蘑菇煎鸡扒', en: 'Sizzling Chicken Chop Mushroom', price: 18, img: '' },
+  { code: 'W3', cat: '西餐', cn: '芝士脆炸鸡扒', en: 'Cheesy Crispy Chicken Chop', price: 24, sauces: [{ zh: '黑椒酱', en: 'Black Pepper' }, { zh: '蘑菇酱', en: 'Mushroom' }, { zh: 'BBQ酱', en: 'BBQ Sauce' }], img: '' },
+  { code: 'W4', cat: '西餐', cn: '奶油芝士鸡扒', en: 'Creamy Butter Cheesy Chicken Chop', price: 22, img: '' },
+  { code: 'W5', cat: '西餐', cn: '海南番茄鸡扒', en: 'Hainanese Chicken Chop', price: 18, img: '' },
+  { code: 'W6', cat: '西餐', cn: '香煎鸡扒饭', en: 'Grilled Chicken Chop With Rice', price: 17, sauces: [{ zh: '黑椒酱', en: 'Black Pepper' }, { zh: '蘑菇酱', en: 'Mushroom' }, { zh: 'BBQ酱', en: 'BBQ Sauce' }], img: '' },
+  { code: 'W7', cat: '西餐', cn: '铁板香煎羊扒(时价)', en: 'Sizzling Lamb Chop (Market Price)', price: 0, marketPrice: true, img: '' },
+  { code: 'W8', cat: '西餐', cn: '香脆炸鱼扒', en: 'Fish & Chips', price: 19, img: '' },
+  { code: 'W9', cat: '西餐', cn: '香煎鸡扒意粉', en: 'Grilled Chicken Chop With Pasta', price: 18, sauces: [{ zh: '黑椒酱', en: 'Black Pepper' }, { zh: '蘑菇酱', en: 'Mushroom' }, { zh: 'BBQ酱', en: 'BBQ Sauce' }], img: '' },
+  { code: 'W10', cat: '西餐', cn: '黑椒羊扒意粉', en: 'Black Pepper Lamb Chop Pasta', price: 28, img: '' },
+  { code: 'W11', cat: '西餐', cn: '芝士焗鸡扒饭', en: 'Cheesy Baked Rice With Chicken Chop', price: 20, img: '' },
+  { code: 'W12', cat: '西餐', cn: '芝士焗鸡扒意粉', en: 'Cheesy Baked Chicken Chop With Pasta', price: 22, img: '' },
+  { code: 'W13', cat: '西餐', cn: '香脆鱼扒饭', en: 'Crispy Deep Fried Fish with Rice', price: 20, sauces: [{ zh: '黑椒酱', en: 'Black Pepper' }, { zh: '蘑菇酱', en: 'Mushroom' }, { zh: '泰式酱', en: 'Thai Sauce' }], img: '' },
+  { code: 'N1', cat: '面类', cn: '鼓椒河粉', en: 'Spicy Black Bean Sauce Kuey Teow', price: 11 },
+  { code: 'N2', cat: '面类', cn: '鼓椒牛肉河', en: 'Spicy Black Bean Sauce Beef Kuey Teow', price: 14 },
+  { code: 'N3', cat: '面类', cn: '鼓椒生面（甜酸辣）', en: 'Spicy Black Bean Sauce Sang Mee', price: 11 },
+  { code: 'N4', cat: '面类', cn: '鼓椒牛肉生面（甜酸辣）', en: 'Spicy Black Bean Sauce Beef Sang Mee', price: 15 },
+  { code: 'N5', cat: '面类', cn: '冬炎汤粉', en: 'Tom Yam Soup With Noodles', price: 16, noodleOptions: [{ zh: '米粉', en: 'Bee Hoon' }, { zh: '黄面', en: 'Yellow Mee' }, { zh: '河粉', en: 'Kuey Teow' }, { zh: '伊面', en: 'Yee Mee' }, { zh: '米粉面', en: 'Bee Hoon Mee' }, { zh: '白饭', en: 'White Rice' }] },
+  { code: 'N6', cat: '面类', cn: '姜葱牛肉河', en: 'Ginger Onion Beef Kuey Teow', price: 14 },
+  { code: 'N7', cat: '面类', cn: '干炒牛肉河', en: 'Dry-Stir Fried Beef Kuey Teow', price: 14 },
+  { code: 'N8', cat: '面类', cn: '炒粿条', en: 'Penang Fried Kuey Teow', price: 10 },
+  { code: 'N9', cat: '面类', cn: '鲜蛤炒粿条', en: 'Fried Kuey Teow Kerang', price: 11 },
+  { code: 'N10', cat: '面类', cn: '月光河', en: 'Fried Moon River Kuey Teow', price: 10 },
+  { code: 'N11', cat: '面类', cn: '炒印度面', en: 'Fried Mamak Mee', price: 11 },
+  { code: 'N12', cat: '面类', cn: '冬炎海鲜炒米粉', en: 'Tom Yam Seafood Fried Bee Hoon', price: 11 },
+  { code: 'N13a', cat: '面类', cn: '滑蛋河', en: 'Cantonese Fried Kuey Teow', price: 10 },
+  { code: 'N13b', cat: '面类', cn: '滑蛋伊面', en: 'Cantonese Fried Yee Mee', price: 10 },
+  { code: 'N14a', cat: '面类', cn: '香低米（纯米粉）', en: 'Cantonese Fried Bee Hoon', price: 11 },
+  { code: 'N14b', cat: '面类', cn: '鸳鸯（米粉+河粉）', en: 'Cantonese Fried Yuan Yang', price: 11 },
+  { code: 'N14c', cat: '面类', cn: '滑蛋生面', en: 'Cantonese Fried Sang Mee', price: 11 },
+  { code: 'N15', cat: '面类', cn: '黑椒乌冬面', en: 'Black Pepper Udon Mee', price: 12 },
+  { code: 'N16', cat: '面类', cn: '黑椒牛肉乌冬面', en: 'Black Pepper Beef Udon Mee', price: 15 },
+  { code: 'N17', cat: '面类', cn: '星洲炒米', en: 'Singapore Fried Bee Hoon', price: 10 },
+  { code: 'N18', cat: '面类', cn: '福建面', en: 'Hokkien Mee', price: 10 },
+  { code: 'N19', cat: '面类', cn: '焖伊面', en: 'Hokkien Style Yee Mee', price: 10 },
+  { code: 'N20', cat: '面类', cn: '罗面', en: 'Loh Mee', price: 10 },
+  { code: 'R1', cat: '饭类', cn: '咖哩鸡椰浆饭', en: 'Nasi Lemak Rendang Chicken', price: 12 },
+  { code: 'R2', cat: '饭类', cn: '双蛋火腿炒饭', en: 'Twin Egg Fried Rice With Ham', price: 12 },
+  { code: 'R3', cat: '饭类', cn: '扬州炒饭', en: 'Chinese Yang Zhou Fried Rice', price: 12 },
+  { code: 'R4', cat: '饭类', cn: '香肠炒饭', en: 'Sausage Fried Rice', price: 12 },
+  { code: 'R5', cat: '饭类', cn: '冬炎炒饭', en: 'Tom Yam Fried Rice', price: 12 },
+  { code: 'R6', cat: '饭类', cn: '家乡炒饭', en: 'Kampung Fried Rice', price: 12 },
+  { code: 'R7', cat: '饭类', cn: '海鲜炒饭', en: 'Seafood Fried Rice', price: 12 },
+  { code: 'R8', cat: '饭类', cn: '甘香炒饭', en: 'Kam Heong Fried Rice', price: 12 },
+  { code: 'R9', cat: '饭类', cn: '银鱼仔炒饭', en: 'Whitebait Fried Rice', price: 12 },
+  { code: 'R10', cat: '饭类', cn: '芭提雅炒饭', en: 'Pattaya Fried Rice', price: 12 },
+  { code: 'R11', cat: '饭类', cn: '牛肉炒饭', en: 'Fried Rice With Beef', price: 14 },
+  { code: 'R12', cat: '饭类', cn: '焖饭', en: 'Cantonese Stew Rice', price: 12 },
+  { code: 'R13', cat: '饭类', cn: '牛肉焖饭', en: 'Cantonese Stew Rice With Beef', price: 14 },
+  { code: 'R14', cat: '饭类', cn: '姜葱鸡丁饭', en: 'Ginger Onion Chicken Rice', price: 13 },
+  { code: 'R15', cat: '饭类', cn: '姜葱鱼片饭', en: 'Ginger Onion Fish Fillet Rice', price: 13 },
+  { code: 'R16', cat: '饭类', cn: '姜葱牛肉饭', en: 'Ginger Onion Beef Rice', price: 14 },
+  { code: 'R17', cat: '饭类', cn: '甘香鸡饭', en: 'Kam Heong Chicken Rice', price: 13 },
+  { code: 'R18', cat: '饭类', cn: '奶油鸡饭', en: 'Creamy Butter Chicken Rice', price: 13 },
+  { code: 'R19', cat: '饭类', cn: '妈蜜鸡饭', en: 'Marmite Chicken Rice', price: 13 },
+  { code: 'R20', cat: '饭类', cn: '京都鸡饭（甜酸）', en: 'Perking Chicken Rice (Sweet & Sour)', price: 13 },
+  { code: 'R21', cat: '饭类', cn: '宫保鸡饭', en: 'Kung Pao Chicken Rice', price: 13 },
+  { code: 'R22', cat: '饭类', cn: '泰式鸡饭', en: 'Thai Style Chicken Rice', price: 13 },
+  { code: 'R23', cat: '饭类', cn: '泰式鱼片饭', en: 'Thai Style Fish Fillet Rice', price: 13 },
+  { code: 'A1', cat: '甜品', cn: '杂雪', en: 'A.B.C', price: 7, mustPackFee: true },
+  { code: 'A2', cat: '甜品', cn: '招牌杂雪', en: 'A.B.C Special', price: 8.5, mustPackFee: true },
+  { code: 'A3', cat: '甜品', cn: 'T.A.K杂果雪', en: 'T.A.K Special', price: 9, mustPackFee: true },
+  { code: 'A4', cat: '甜品', cn: '煎蕊', en: 'Cendol Iced', price: 7.5, mustPackFee: true },
+  { code: 'A5', cat: '甜品', cn: '红豆冰', en: 'Ice Kacang', price: 7.5, mustPackFee: true },
+  { code: 'A6', cat: '甜品', cn: '玉米冰', en: 'Ice Jagung', price: 7.5, mustPackFee: true },
+  { code: 'A7', cat: '甜品', cn: '鲜奶雪糕', en: 'Fresh Milk With Ice Cream', price: 7.5, mustPackFee: true, flavorOptions: [{ zh: '香草', en: 'Vanilla', extra: 0 }, { zh: '巧克力', en: 'Chocolate', extra: 0 }, { zh: '草莓', en: 'Strawberry', extra: 0 }, { zh: '薄荷', en: 'Mint', extra: 0 }, { zh: '芋头', en: 'Yam', extra: 0 }, { zh: '椰子', en: 'Coconut', extra: 0 }, { zh: '斑斓 (+RM1)', en: 'Pandan (+RM1)', extra: 1 }] },
+  { code: 'A8', cat: '甜品', cn: '小丑雪糕', en: 'Chico De Clown', price: 10, mustPackFee: true },
+  { code: 'A9', cat: '甜品', cn: '香蕉船', en: 'Banana Split', price: 13, mustPackFee: true },
+  { code: 'A10', cat: '甜品', cn: '雪糕', en: 'Single Scoop', price: 4.5, mustPackFee: true, singleScoopOptions: [{ zh: '香草', en: 'Vanilla', price: 4.5 }, { zh: '巧克力', en: 'Chocolate', price: 4.5 }, { zh: '草莓', en: 'Strawberry', price: 4.5 }, { zh: '薄荷', en: 'Mint', price: 4.5 }, { zh: '芋头', en: 'Yam', price: 4.5 }, { zh: '椰子', en: 'Coconut', price: 4.5 }, { zh: '斑斓 (RM5)', en: 'Pandan (RM5)', price: 5 }] },
+  { code: 'D1', cat: '饮料', cn: '柠檬红茶', en: 'Iced Lemon Tea', price: 5.5 },
+  { code: 'D2', cat: '饮料', cn: '冰冻蜜桃茶', en: 'Iced Peach Tea', price: 6 },
+  { code: 'D3', cat: '饮料', cn: '冻柠蜜', en: 'Honey Lemon', price: 6.5 },
+  { code: 'D4', cat: '饮料', cn: '咸柠七', en: 'Salty Lime 7up', price: 8 },
+  { code: 'D5', cat: '饮料', cn: '冻柠宾', en: 'Fresh Lemon Ribena', price: 7 },
+  { code: 'D6', cat: '饮料', cn: '利宾纳龙眼冰', en: 'Ribena Longan', price: 8 },
+  { code: 'D7', cat: '饮料', cn: '利宾纳荔枝冰', en: 'Ribena Lychee', price: 8 },
+  { code: 'D8', cat: '饮料', cn: '冻柠乐', en: 'Fresh Lemon Coke', price: 7 },
+  { code: 'D9', cat: '饮料', cn: '香茅酸柑荔枝冰', en: 'Lemongrass Lime Lychee', price: 8 },
+  { code: 'D10', cat: '饮料', cn: '荔枝柠檬冰', en: 'Lychee & Lemon Cooler', price: 8 },
+  { code: 'D11', cat: '饮料', cn: '龙眼水 / 荔枝水', en: 'Longan Iced / Lychee Iced', price: 5.5, sauces: [{ zh: '龙眼水', en: 'Longan Iced' }, { zh: '荔枝水', en: 'Lychee Iced' }] },
+  { code: 'D12', cat: '饮料', cn: '白咖啡冰', en: 'White Coffee Ice', price: 5.5 },
+  { code: 'D13', cat: '饮料', cn: '白咖啡凉粉', en: 'White Coffee with Cincau', price: 7 },
+  { code: 'D14', cat: '饮料', cn: '豆奶凉粉', en: 'Michael Jackson (Soya Cincau)', price: 6 },
+  { code: 'D15', cat: '饮料', cn: '黑糖豆奶', en: 'Soya with Brown Sugar', price: 5.5 },
+  { code: 'D16', cat: '饮料', cn: '巧克力冰', en: 'Chocolate Iced', price: 8 },
+  { code: 'D17', cat: '饮料', cn: '凉水（罗汉果）', en: 'Herbal Tea', price: 4.5 },
+  { code: 'D18', cat: '饮料', cn: '清水 / 冰水', en: 'Sky Juice (Water)', price: 1 },
+  { code: 'D19', cat: '饮料', cn: '可乐雪糕(巧克力)', en: 'Coke Float Chocolate', price: 8 },
+  { code: 'D20', cat: '饮料', cn: '可乐雪糕(香草)', en: 'Coke Float Vanilla', price: 8 },
+  { code: 'D21', cat: '饮料', cn: '麦根沙士雪糕', en: 'Root Beer Float', price: 8 },
+  { code: 'D22', cat: '饮料', cn: '汽水(可乐/100Plus/A&W)', en: 'Soft Drinks (Coke/100Plus/A&W)', price: 4, sauces: [{ zh: '可乐', en: 'Coke' }, { zh: '100Plus', en: '100Plus' }, { zh: 'A&W', en: 'A&W' }] },
+  { code: 'J1', cat: '饮料', cn: '西瓜汁', en: 'Watermelon Juice', price: 7, noIcePrice: 9.5 },
+  { code: 'J2', cat: '饮料', cn: '萝卜汁', en: 'Carrot Juice', price: 7, noIcePrice: 9.5 },
+  { code: 'J3', cat: '饮料', cn: '鲜橙汁', en: 'Orange Juice', price: 7, noIcePrice: 9.5 },
+  { code: 'J4', cat: '饮料', cn: '苹果汁', en: 'Apple Juice', price: 7, noIcePrice: 9.5 },
+  { code: 'J5', cat: '饮料', cn: '桔仔酸梅汁', en: 'Calamansi Lime Sour Plum', price: 7.5, noIcePrice: 9.5 },
+  { code: 'J6', cat: '饮料', cn: '苹果酸梅汁', en: 'Apple Sour Plum', price: 8, noIcePrice: 9.5 },
+  { code: 'J7', cat: '饮料', cn: '西瓜柠檬汁', en: 'Watermelon Lemon', price: 8.5, noIcePrice: 9.5 },
+  { code: 'J8', cat: '饮料', cn: '混合果汁', en: 'Mixed Juice', price: 9.5, noIcePrice: 10 },
+  { code: 'H1', cat: '饮料', cn: '热蜜桃茶', en: 'Hot Peach Tea', price: 6 },
+  { code: 'H2', cat: '饮料', cn: '热绿茶', en: 'Hot Green Tea', price: 4.5 },
+  { code: 'H3', cat: '饮料', cn: '韩国柚子茶', en: 'Korea Yuzu Tea', price: 6 },
+  { code: 'H4', cat: '饮料', cn: '格雷伯爵茶', en: 'Earl Grey Tea', price: 4.5 },
+  { code: 'H5', cat: '饮料', cn: '热咸金桔', en: 'Salty Lime Kamquat', price: 4.5 },
+  { code: 'H6', cat: '饮料', cn: '热柠茶', en: 'Hot Lemon Tea', price: 5.5 },
+  { code: 'H7', cat: '饮料', cn: '热蜜糖柠檬', en: 'Hot Honey Lemon', price: 6.5 },
+  { code: 'H8', cat: '饮料', cn: '热白咖啡', en: 'Local White Coffee', price: 5.5 },
+  { code: 'H9', cat: '饮料', cn: '热巧克力', en: 'Hot Chocolate', price: 8 },
+  { code: 'F1', cat: '饮料', cn: '柠檬薄荷冰沙', en: 'Frozen Mint Lemonade', price: 10, mustPackFee: true },
+  { code: 'S1', cat: '饮料', cn: '巧克力奥利奥雪糕奶昔', en: 'Chocolate Oreo Crunch', price: 13, mustPackFee: true, addon: { zh: '加奶油', en: 'Add Cream', price: 3 } },
+  { code: 'S2', cat: '饮料', cn: '香草奥利奥雪糕奶昔', en: 'Vanilla Oreo Crunch', price: 13, mustPackFee: true, addon: { zh: '加奶油', en: 'Add Cream', price: 3 } },
+  { code: 'S3', cat: '饮料', cn: '焦糖饼干香草奶昔', en: 'Caramel Bisscoff Vanilla', price: 13, mustPackFee: true, addon: { zh: '加奶油', en: 'Add Cream', price: 3 } },
+  { code: 'S4', cat: '饮料', cn: '巧克力雪糕奶昔', en: 'Rich Chocolate Milkshake', price: 10, mustPackFee: true, addon: { zh: '加奶油', en: 'Add Cream', price: 3 } },
+  { code: 'S5', cat: '饮料', cn: '香草雪糕奶昔', en: 'Rich Vanilla Milkshake', price: 10, mustPackFee: true, addon: { zh: '加奶油', en: 'Add Cream', price: 3 } },
+  { code: 'S6', cat: '饮料', cn: '椰子雪糕奶昔', en: 'Coconut Milkshake', price: 12, mustPackFee: true, addon: { zh: '加奶油', en: 'Add Cream', price: 3 } },
+  { code: 'S7', cat: '饮料', cn: '薄荷巧克力雪糕奶昔', en: 'Mint Chocolate Chips', price: 10, mustPackFee: true, addon: { zh: '加奶油', en: 'Add Cream', price: 3 } },
+  { code: 'S8', cat: '饮料', cn: '芋头雪糕奶昔', en: 'Yam Milkshake', price: 12, mustPackFee: true, addon: { zh: '加奶油', en: 'Add Cream', price: 3 } },
+  { code: 'S9', cat: '饮料', cn: '草莓雪糕奶昔', en: 'Strawberry Milkshake', price: 10, mustPackFee: true, addon: { zh: '加奶油', en: 'Add Cream', price: 3 } },
+  { code: 'S10', cat: '饮料', cn: '新鲜芒果冰沙', en: 'Mango Smoothie', price: 12, mustPackFee: true, addon: { zh: '加奶油', en: 'Add Cream', price: 3 } },
+  { code: 'S11', cat: '饮料', cn: '白咖啡冰沙', en: 'White Coffee Smoothie', price: 10, mustPackFee: true, addon: { zh: '加奶油', en: 'Add Cream', price: 3 } },
+  { code: 'S12', cat: '饮料', cn: '卡普奇诺咖啡冰沙', en: 'Cappuccino Smoothie', price: 10, mustPackFee: true, addon: { zh: '加奶油', en: 'Add Cream', price: 3 } },
+  { code: 'SO1', cat: '饮料', cn: '韩国柚子苏打', en: 'Korea Yuzu Soda', price: 9.5 },
+  { code: 'SO2', cat: '饮料', cn: '利宾纳柠檬苏打', en: 'Ribena Lemonade Soda', price: 9.5 },
+  { code: 'SO3', cat: '饮料', cn: '蓝色海洋苏打', en: 'Blue Ocean Lemonade Soda', price: 9.5 },
+  { code: 'SO4', cat: '饮料', cn: '蜜糖柠檬苏打', en: 'Honey Lemon Soda', price: 9.5 },
+  { code: 'SO5', cat: '饮料', cn: '清爽香茅酸柑苏打', en: 'Lemongrass Mojito Soda', price: 9.5 },
+  { code: 'SD1', cat: '小食', cn: '招牌炸鸡翅', en: 'Signature Chicken Wings', price: 18 },
+  { code: 'SD2', cat: '小食', cn: '咸蛋炸薯条', en: 'Salted Egg French Fries', price: 16 },
+  { code: 'SD3', cat: '小食', cn: '芝士薯条', en: 'Cheesy French Fries', price: 15 },
+  { code: 'SD4', cat: '小食', cn: '芝士香肠薯条拼盘', en: 'Jumbo Cheesy Sausage With Chips Set', price: 16 },
+  { code: 'SD5', cat: '小食', cn: '香脆炸薯条', en: 'French Fries', price: 9 },
+  { code: 'SD6', cat: '小食', cn: '黄金鸡块（八块）', en: 'Golden Nuggets (8pcs)', price: 9.5 },
+  { code: 'SD7', cat: '小食', cn: '早餐', en: 'Breakfast Set', price: 11 },
+  { code: 'SD8', cat: '小食', cn: '法兰西多士', en: 'French Toast', price: 8 },
+  { code: 'SD9', cat: '小食', cn: '雪糕多士', en: 'Ice Cream Toast', price: 9 }
+];
+
+let customMenuOverrides = JSON.parse(localStorage.getItem('rainbow_menu_overrides') || '{}');
+let extraMenuItems = JSON.parse(localStorage.getItem('rainbow_extra_menu_items') || '[]');
+
+let _cachedMergedMenu = null;
+let _cachedMergedMenuByCode = null;
+let _menuRenderTimer = null;
+let _menuMgrRenderTimer = null;
+
+function invalidateMenuCache() {
+  _cachedMergedMenu = null;
+  _cachedMergedMenuByCode = null;
+}
+
+function getMergedMenu() {
+  if (_cachedMergedMenu) return _cachedMergedMenu;
+  const mergedBase = BASE_MENU.map(item => {
+    const ov = customMenuOverrides[item.code] || {};
+    return {
+      ...item,
+      cn: ov.cn || item.cn,
+      en: ov.en || item.en,
+      price: (typeof ov.price === 'number' && !isNaN(ov.price)) ? ov.price : item.price,
+      img: ov.img !== undefined ? ov.img : (item.img || '')
+    };
+  });
+  _cachedMergedMenu = [...mergedBase, ...extraMenuItems];
+  _cachedMergedMenuByCode = new Map(_cachedMergedMenu.map(m => [m.code, m]));
+  return _cachedMergedMenu;
+}
+
+function getMenuItemByCode(code) {
+  if (!_cachedMergedMenuByCode) getMergedMenu();
+  return _cachedMergedMenuByCode.get(code);
+}
+
+function debouncedRenderMenu() {
+  clearTimeout(_menuRenderTimer);
+  _menuRenderTimer = setTimeout(() => {
+    requestAnimationFrame(renderMenu);
+  }, 90);
+}
+
+function debouncedRenderMenuManager() {
+  clearTimeout(_menuMgrRenderTimer);
+  _menuMgrRenderTimer = setTimeout(() => {
+    requestAnimationFrame(renderMenuManager);
+  }, 110);
+}
+
+const TABLES = ['1', '2', '3', '3A', '5', '6', '7', '8', '9', '10', '11', '12', 'TAKEAWAY'];
+const CATEGORIES = [
+  { key: '全部', zh: '全部', en: 'All' },
+  { key: '西餐', zh: '西餐', en: 'Western' },
+  { key: '面类', zh: '面类', en: 'Noodles' },
+  { key: '饭类', zh: '饭类', en: 'Rice' },
+  { key: '甜品', zh: '甜品', en: 'Dessert' },
+  { key: '饮料', zh: '饮料', en: 'Drinks' },
+  { key: '小食', zh: '小食', en: 'Snacks' }
+];
+const REMARK_PRESETS = [
+  { zh: '兑换 Redeemed', en: 'Stamp Redeemed' },
+  { zh: '少冰', en: 'Less Ice' }, { zh: '去冰', en: 'No Ice' }, { zh: '少甜', en: 'Less Sweet' },
+  { zh: '走甜', en: 'No Sugar' }, { zh: '不辣', en: 'No Spicy' }, { zh: '加辣', en: 'Extra Spicy' },
+  { zh: '分开酱汁', en: 'Sauce Separate' }
+];
+const EXP_CATS = [
+  { zh: '买菜/食材', en: 'Ingredients' }, { zh: '煤气', en: 'Gas' }, { zh: '杂费', en: 'Misc' },
+  { zh: '员工薪水', en: 'Wages' }, { zh: '水电费', en: 'Utilities' }, { zh: '店租', en: 'Rental' },
+  { zh: '包装耗材', en: 'Packaging' }
+];
+
+const EXP_ZH_TO_EN_MAP = {
+  '买菜/食材': 'Ingredients', '买菜': 'Ingredients', '食材': 'Ingredients',
+  '煤气': 'Gas', '杂费': 'Misc', '员工薪水': 'Wages', '薪水': 'Wages',
+  '水电费': 'Utilities', '水电': 'Utilities', '店租': 'Rental', '租金': 'Rental',
+  '包装耗材': 'Packaging', '包装': 'Packaging', '鸡肉': 'Chicken',
+  '蔬菜': 'Vegetables', '买材料': 'Materials', '材料': 'Materials'
+};
+
+function translateExpenseToEnglish(exp) {
+  const catEn = EXP_ZH_TO_EN_MAP[exp.cat] || (EXP_CATS.find(c => c.zh === exp.cat)?.en) || exp.cat || 'Expense';
+  const rawNote = String(exp.note || '').trim();
+  if (!rawNote) return catEn;
+  if (EXP_ZH_TO_EN_MAP[rawNote]) return EXP_ZH_TO_EN_MAP[rawNote];
+  let converted = rawNote;
+  Object.keys(EXP_ZH_TO_EN_MAP).sort((a, b) => b.length - a.length).forEach(zhKey => {
+    if (converted.includes(zhKey)) converted = converted.split(zhKey).join(EXP_ZH_TO_EN_MAP[zhKey]);
+  });
+  return converted;
+}
+
+const I18N = {
+  zh: {
+    settingsBtn: '设置', settingsModalTitle: '系统设置', setWifiTitle: 'Wi-Fi / 网络状态',
+    setLangTitle: '语言转换 (Language)', setZoomTitle: '界面缩放 (UI Zoom)', setHapticTitle: '平板 / 手机触感震动',
+    hapticOn: '📳 触感震动：开启', hapticOff: '📴 触感震动：关闭', zoomResetBtn: '恢复 100%',
+    setPrinterTitle: '打印机检测（蓝牙由平板/手机系统连接）', checkPrinterBtn: '🔍 检测打印接口',
+    testPrintBtn: '🖨️ 测试打印小票',
+    printerNote: '说明：蓝牙连接在平板/手机系统设置中完成；结账小票走热敏小票，日结/月结单走纯英文紧凑 A4 排版（可另存为 PDF）。',
+    closeBtn: '完成',
+    wifiOnlineDetail: '当前状态：在线 (Online) — 青色灯亮起。同网址/同浏览器修改菜单或照片会自动同步；跨独立设备请用“导出/导入同步包”。',
+    wifiOfflineDetail: '当前状态：离线 (Offline) — 红色灯亮起。本地点餐、收银、记账与打印仍可正常使用。',
+    tabOrder: '1. 点餐下单', tabPos: '2. 收银台', tabAccount: '3. 收支记账', tabMenu: '4. 菜单管理',
+    tableHintPrefix: '选择桌号（支持多选拼桌，4号已改为3A）：', noTable: '未选桌号', takeaway: '打包',
+    searchPlaceholder: '🔍 全局秒搜全部菜品（编号如 W3, N5, N14b, A10, SD1 或中英文）...',
+    gridBtn: '⊞ 网格', colBtn: '☰ 列表', cartSubLabel: '当前桌号 / 方式', customItemBtn: '+ 临时项目',
+    clearBtn: '清空', totalLabel: '合计 (Nett):', sendOrderBtn: '✅ 送出订单', updateOrderBtn: '✅ 保存修改并送出',
+    posPageTitle: '活跃桌单 & 结账收银（无税 Nett）', sortNewest: '排序：最新下单', sortOldest: '排序：最早下单',
+    noActiveOrders: '目前没有待结账桌单', cashBtn: '💵 现金', qrBtn: '📱 DuitNow QR',
+    editOrderBtn: '✏️ 修改订单', printBtn: '🖨️ 打印', delBtn: '🗑️ 删除',
+    accPageTitle: '日 / 月 / 年 营收、支出与结单打印',
+    bizDayLabel: '营业归属日：', bizMonthLabel: '结账月份：',
+    printDailyBtn: '📄 Daily Closing (A4/PDF)', printMonthlyBtn: '📑 Monthly Closing (A4/PDF)',
+    scopeDay: '所选营业日', scopeMonth: '所选月份', scopeYear: '全年 (2026-01-01 至今)',
+    scopeLabelDay: '当前明细范围：营业日记录', scopeLabelMonth: '当前明细范围：月度记录', scopeLabelYear: '当前明细范围：全年记录',
+    platformTitle: '🛵 手动录入 Foodpanda / Grabfood 订单',
+    platformRefPlaceholder: '单号 / 备注（如 #FP-102 或 午餐单）',
+    platformAmtPlaceholder: '金额 (RM)',
+    platformAddBtn: '加入收入',
+    paidHistTitle: '🧾 已结账收入历史记录',
+    addExpTitle: '➕ 记录支出',
+    expAmountPlaceholder: '金额 (RM)', expNotePlaceholder: '备注（如：鸡肉、蔬菜、买材料）', saveExpBtn: '保存支出',
+    expHistTitle: '📋 支出明细记录',
+    noPaidHist: '该时段暂无已结账订单记录', noExpHist: '该时段暂无支出记录',
+    editExpBtn: '✏️ 修改', editPaidBtn: '🗓️ 改日期/金额',
+    editPaidModalTitle: '修改已结账单据', editPaidDateLabel: '营业归属日：', editPaidPayLabel: '付款方式：', editPaidTotalLabel: '实收金额 (RM)：',
+    editExpModalTitle: '修改支出记录', editExpCatLabel: '支出分类：', editExpDateLabel: '归属营业日期：', editExpAmtLabel: '金额 (RM)：', editExpNoteLabel: '备注：',
+    menuMgrTitle: '菜单管理',
+    autoSyncHint: '同浏览器/同网址自动同步 · 跨设备可用同步包', exportSyncBtn: '📤 导出同步包', importSyncBtn: '📥 导入同步包',
+    addNewDishTitle: '新增食物 / 饮料', newDishCodePlaceholder: '编号（如 D23，可留空）',
+    newDishCnPlaceholder: '中文名称', newDishEnPlaceholder: '英文名称', newDishPricePlaceholder: '价格 (RM)',
+    newDishPhotoBtn: '📷 上传照片', createDishBtn: '✅ 新增到菜单',
+    mgrSearchPlaceholder: '🔍 筛选菜品编号或名称...', uploadPhotoBtn: '📷 换图', priceBtn: '💲 改价', editBtn: '✏️ 改名',
+    redeemedTag: '兑换 Redeemed', editPriceModalTitle: '直接修改价格', editPriceLabel: '新价格 (RM)：',
+    editNameModalTitle: '修改菜品 / 凉水名称', editCnLabel: '中文名称：', editEnLabel: '英文名称：',
+    customModalTitle: '新增临时项目', customNameLabel: '项目名称：', customNamePlaceholder: '例如：特殊加料',
+    customPriceLabel: '临时价格 (RM)：', remarkModalTitle: '菜品备注 / 盖章兑换', remarkCustomPlaceholder: '输入备注...',
+    marketPriceLabel: '时价', iceLabel: '冰', noIceLabel: '去冰', imgPlaceholder: '图位',
+    cancelBtn: '取消', confirmBtn: '确定', saveBtn: '保存', addBtn: '加入订单',
+    cashModalTitle: '💵 现金结账 / Cash Settlement', cashTableLabel: '桌号 / Table:', cashDueLabel: '应付金额 / Due:',
+    cashGivenLabel: '顾客付现金额（需找零才输入）：', cashExactBtn: '⚡ 无需找钱 / 直接结账', cashConfirmBtn: '✅ 确认找零并结账'
+  },
+  en: {
+    settingsBtn: 'Settings', settingsModalTitle: 'System Settings', setWifiTitle: 'Wi-Fi / Network Status',
+    setLangTitle: 'Language Switch', setZoomTitle: 'Display Zoom', setHapticTitle: 'Touch Haptic Feedback',
+    hapticOn: '📳 Haptic Feedback: ON', hapticOff: '📴 Haptic Feedback: OFF', zoomResetBtn: 'Reset 100%',
+    setPrinterTitle: 'Printer Check', checkPrinterBtn: '🔍 Check Print API', testPrintBtn: '🖨️ Test Print',
+    printerNote: 'Note: Receipts print to thermal roll; Daily & Monthly reports print in English compact A4 (Save as PDF).',
+    closeBtn: 'Done',
+    wifiOnlineDetail: 'Status: Online. Auto-syncs on same origin; use Export/Import JSON across devices.',
+    wifiOfflineDetail: 'Status: Offline. Local POS, accounting & printing still work.',
+    tabOrder: '1. Order', tabPos: '2. POS', tabAccount: '3. Accounts', tabMenu: '4. Menu Mgr',
+    tableHintPrefix: 'Select Table (Mergeable, 4 → 3A):', noTable: 'No Table', takeaway: 'Takeaway',
+    searchPlaceholder: '🔍 Global search all items by code, EN or CN...',
+    gridBtn: '⊞ Grid', colBtn: '☰ Column', cartSubLabel: 'Table / Mode', customItemBtn: '+ Custom Item',
+    clearBtn: 'Clear', totalLabel: 'Total (Nett):', sendOrderBtn: '✅ Send Order', updateOrderBtn: '✅ Save & Update Order',
+    posPageTitle: 'Active Orders & POS (Nett)', sortNewest: 'Sort: Newest', sortOldest: 'Sort: Oldest',
+    noActiveOrders: 'No active orders', cashBtn: '💵 Cash', qrBtn: '📱 DuitNow QR',
+    editOrderBtn: '✏️ Edit Order', printBtn: '🖨️ Print', delBtn: '🗑️ Delete',
+    accPageTitle: 'Revenue, Expense & A4 Closing Statements',
+    bizDayLabel: 'Biz Date:', bizMonthLabel: 'Month:',
+    printDailyBtn: '📄 Daily Closing (A4/PDF)', printMonthlyBtn: '📑 Monthly Closing (A4/PDF)',
+    scopeDay: 'Biz Day', scopeMonth: 'Month', scopeYear: 'Year (Since 2026-01-01)',
+    scopeLabelDay: 'Showing: Business Day Records', scopeLabelMonth: 'Showing: Monthly Records', scopeLabelYear: 'Showing: Yearly Records',
+    platformTitle: '🛵 Manual Foodpanda / Grabfood Order Entry',
+    platformRefPlaceholder: 'Order No. / Note (e.g. #FP-102 or Lunch)',
+    platformAmtPlaceholder: 'Amount (RM)',
+    platformAddBtn: 'Add Revenue',
+    paidHistTitle: '🧾 Paid Order History',
+    addExpTitle: '➕ Add Expense',
+    expAmountPlaceholder: 'Amount (RM)', expNotePlaceholder: 'Note (e.g. Chicken, Veggies)', saveExpBtn: 'Save Expense',
+    expHistTitle: '📋 Expense History',
+    noPaidHist: 'No paid orders in this period', noExpHist: 'No expenses in this period',
+    editExpBtn: '✏️ Edit', editPaidBtn: '🗓️ Edit Date/Amt',
+    editPaidModalTitle: 'Edit Paid Order', editPaidDateLabel: 'Business Date:', editPaidPayLabel: 'Payment Method:', editPaidTotalLabel: 'Total Amount (RM):',
+    editExpModalTitle: 'Edit Expense Record', editExpCatLabel: 'Category:', editExpDateLabel: 'Business Date:', editExpAmtLabel: 'Amount (RM):', editExpNoteLabel: 'Note:',
+    menuMgrTitle: 'Menu Manager',
+    autoSyncHint: 'Auto-syncs on same origin', exportSyncBtn: '📤 Export Sync', importSyncBtn: '📥 Import Sync',
+    addNewDishTitle: 'Add New Food / Drink', newDishCodePlaceholder: 'Code (optional)',
+    newDishCnPlaceholder: 'Chinese Name', newDishEnPlaceholder: 'English Name', newDishPricePlaceholder: 'Price (RM)',
+    newDishPhotoBtn: '📷 Upload Photo', createDishBtn: '✅ Add to Menu',
+    mgrSearchPlaceholder: '🔍 Filter by code or name...', uploadPhotoBtn: '📷 Photo', priceBtn: '💲 Price', editBtn: '✏️ Name',
+    redeemedTag: '兑换 Redeemed', editPriceModalTitle: 'Edit Item Price', editPriceLabel: 'New Price (RM):',
+    editNameModalTitle: 'Edit Item Name', editCnLabel: 'Chinese Name:', editEnLabel: 'English Name:',
+    customModalTitle: 'Add Custom Item', customNameLabel: 'Item Name:', customNamePlaceholder: 'Special Request',
+    customPriceLabel: 'Price (RM):', remarkModalTitle: 'Remarks / Stamp Redemption', remarkCustomPlaceholder: 'Note...',
+    marketPriceLabel: 'Market Price', iceLabel: 'Ice', noIceLabel: 'No Ice', imgPlaceholder: 'Photo',
+    cancelBtn: 'Cancel', confirmBtn: 'Confirm', saveBtn: 'Save', addBtn: 'Add Item',
+    cashModalTitle: '💵 Cash Settlement', cashTableLabel: 'Table:', cashDueLabel: 'Total Due:',
+    cashGivenLabel: 'Cash Received (enter if change needed):', cashExactBtn: '⚡ Exact Cash / Settle Now', cashConfirmBtn: '✅ Confirm Change & Settle'
+  }
+};
+
+function getDefaultBusinessDateStr(d = new Date()) {
+  const workDate = new Date(d.getTime());
+  if (workDate.getHours() < 6) workDate.setDate(workDate.getDate() - 1);
+  const pad = n => String(n).padStart(2, '0');
+  return `${workDate.getFullYear()}-${pad(workDate.getMonth() + 1)}-${pad(workDate.getDate())}`;
+}
+
+let selectedBizDate = localStorage.getItem('rainbow_biz_date') || getDefaultBusinessDateStr();
+let selectedClosingMonth = localStorage.getItem('rainbow_closing_month') || selectedBizDate.slice(0, 7);
+let selectedTables = [];
+let currentCat = '全部';
+let menuLayout = 'grid';
+let posLayout = 'grid';
+let historyScope = 'day';
+let cart = [];
+let activeOrders = JSON.parse(localStorage.getItem('rainbow_active_orders') || '[]');
+let completedOrders = JSON.parse(localStorage.getItem('rainbow_completed_orders') || '[]');
+let expenses = JSON.parse(localStorage.getItem('rainbow_expenses') || '[]');
+let editingRemarkIndex = -1;
+let selectedRemarkTags = [];
+
+function triggerHaptic(pattern = 12) {
+  if (!hapticEnabled) return;
+  try { if (navigator && typeof navigator.vibrate === 'function') navigator.vibrate(pattern); } catch (e) {}
+}
+function toggleHapticSetting() {
+  hapticEnabled = !hapticEnabled;
+  localStorage.setItem('rainbow_haptic_enabled', hapticEnabled ? 'on' : 'off');
+  updateHapticBtnText();
+  if (hapticEnabled) triggerHaptic(18);
+}
+function updateHapticBtnText() {
+  const btn = document.getElementById('btn-haptic-toggle');
+  if (!btn) return;
+  btn.textContent = hapticEnabled ? t('hapticOn') : t('hapticOff');
+  btn.classList.toggle('active', hapticEnabled);
+}
+function updateWifiStatus() {
+  const led = document.getElementById('wifi-status-led');
+  const isOnline = navigator.onLine !== false;
+  if (led) { led.classList.toggle('online', isOnline); led.classList.toggle('offline', !isOnline); }
+  const detailEl = document.getElementById('settings-wifi-detail');
+  if (detailEl) detailEl.textContent = isOnline ? t('wifiOnlineDetail') : t('wifiOfflineDetail');
+}
+function goHomeOrderPage() {
+  document.getElementById('main-header').classList.remove('header-scrolled');
+  switchPage('order', document.getElementById('tab-order'));
+}
+function applyTheme() {
+  document.body.classList.toggle('dark-mode', themeMode === 'dark');
+  const iconEl = document.getElementById('theme-icon');
+  const labelEl = document.getElementById('theme-label');
+  if (iconEl && labelEl) {
+    if (themeMode === 'dark') { iconEl.textContent = '☀️'; labelEl.textContent = 'Light'; }
+    else { iconEl.textContent = '🌙'; labelEl.textContent = 'Dark'; }
+  }
+}
+function toggleTheme() {
+  themeMode = themeMode === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('rainbow_theme_mode', themeMode);
+  applyTheme();
+}
+function applyZoom() {
+  if (isNaN(uiZoom) || uiZoom < 80) uiZoom = 80;
+  if (uiZoom > 150) uiZoom = 150;
+  localStorage.setItem('rainbow_ui_zoom', String(uiZoom));
+  const setZoomVal = document.getElementById('set-zoom-val');
+  if (setZoomVal) setZoomVal.textContent = `${uiZoom}%`;
+  document.getElementById('app-zoom-shell').style.zoom = `${uiZoom}%`;
+}
+function changeZoom(delta) { uiZoom += delta; applyZoom(); }
+function resetZoom() { uiZoom = 100; applyZoom(); }
+function t(key) { return I18N[lang][key] || ''; }
+function itemTitle(item) { return lang === 'zh' ? item.cn : item.en; }
+function bilingualItemName(item) {
+  if (item.cn && item.en && item.cn !== item.en) return `${item.cn} / ${item.en}`;
+  return item.cn || item.en || '';
+}
+function optText(obj) { return typeof obj === 'string' ? obj : (lang === 'zh' ? obj.zh : obj.en); }
+
+function formatRedeemAndRemark(item) {
+  const parts = [];
+  if (item.redeemed) parts.push(t('redeemedTag'));
+  if (item.remark) {
+    const cleanedRemark = String(item.remark)
+      .split(/[,，]/)
+      .map(s => s.trim())
+      .filter(s => s && !/^兑换\s*Redeemed$/i.test(s) && !/^Stamp\s*Redeemed$/i.test(s));
+    parts.push(...cleanedRemark);
+  }
+  return Array.from(new Set(parts));
+}
+
+function syncSettingsModalUI() {
+  const isZh = lang === 'zh';
+  const btnZh = document.getElementById('btn-lang-zh');
+  const btnEn = document.getElementById('btn-lang-en');
+
+  if (btnZh) {
+    btnZh.classList.toggle('active', isZh);
+    btnZh.style.setProperty('background', isZh ? '#0d6efd' : '#ffffff', 'important');
+    btnZh.style.setProperty('color', isZh ? '#ffffff' : '#111827', 'important');
+    btnZh.style.setProperty('border-color', isZh ? '#0d6efd' : '#d1d5db', 'important');
+  }
+  if (btnEn) {
+    btnEn.classList.toggle('active', !isZh);
+    btnEn.style.setProperty('background', !isZh ? '#0d6efd' : '#ffffff', 'important');
+    btnEn.style.setProperty('color', !isZh ? '#ffffff' : '#111827', 'important');
+    btnEn.style.setProperty('border-color', !isZh ? '#0d6efd' : '#d1d5db', 'important');
+  }
+
+  const zoomValEl = document.getElementById('set-zoom-val');
+  const zoomResetBtn = document.getElementById('btn-zoom-reset');
+  if (zoomValEl) zoomValEl.textContent = `${uiZoom}%`;
+  if (zoomResetBtn) {
+    const isNotDefaultZoom = Number(uiZoom) !== 100;
+    zoomResetBtn.classList.toggle('active', isNotDefaultZoom);
+    zoomResetBtn.style.setProperty('background', isNotDefaultZoom ? '#0d6efd' : '#ffffff', 'important');
+    zoomResetBtn.style.setProperty('color', isNotDefaultZoom ? '#ffffff' : '#111827', 'important');
+    zoomResetBtn.style.setProperty('border-color', isNotDefaultZoom ? '#0d6efd' : '#d1d5db', 'important');
+  }
+}
+
+function setLanguage(targetLang) {
+  lang = targetLang;
+  if (typeof applyI18n === 'function') applyI18n();
+  syncSettingsModalUI();
+  if (typeof renderTables === 'function') renderTables();
+  if (typeof renderCats === 'function') renderCats();
+  if (typeof renderMenu === 'function') renderMenu();
+  if (typeof renderCart === 'function') renderCart();
+  if (typeof renderPOS === 'function') renderPOS();
+  if (typeof renderAccounting === 'function') renderAccounting();
+  if (typeof renderMenuManager === 'function') renderMenuManager();
+}
+
+function openSettingsModal() {
+  syncSettingsModalUI();
+  if (typeof updateHapticBtnText === 'function') updateHapticBtnText();
+  if (typeof updateWifiStatus === 'function') updateWifiStatus();
+  const printerStatusEl = document.getElementById('printer-status-text');
+  if (printerStatusEl) printerStatusEl.textContent = t('printerNote');
+  const modalEl = document.getElementById('settings-modal');
+  if (modalEl) modalEl.classList.add('show');
+}
+function checkPrinterStatus() {
+  const hasPrint = typeof window.print === 'function';
+  document.getElementById('printer-status-text').innerHTML = hasPrint
+    ? (lang === 'zh' ? '✅ <b>打印接口正常</b>：支持热敏小票与 A4/PDF 结账单打印。' : '✅ <b>Print API Ready</b>.')
+    : (lang === 'zh' ? '⚠️ 当前环境不支持直接打印。' : '⚠️ Print API unavailable.');
+}
+function testPrintSample() {
+  printReceiptData({
+    id: 'TEST-001', table: '1', dateTimeStr: formatSpaceDate(new Date()), payMethod: 'Test',
+    items: [{ code: 'SD5', cn: '香脆炸薯条', en: 'French Fries', qty: 1, spec: '', redeemed: false, subTotal: 9 }], total: 9
+  }, 'Test Print');
+}
+
+function applyI18n() {
+  applyTheme(); updateWifiStatus();
+  document.getElementById('settings-btn-label').textContent = t('settingsBtn');
+  document.getElementById('settings-modal-title').textContent = t('settingsModalTitle');
+  document.getElementById('set-wifi-title').textContent = t('setWifiTitle');
+  document.getElementById('set-lang-title').textContent = t('setLangTitle');
+  document.getElementById('set-zoom-title').textContent = t('setZoomTitle');
+  document.getElementById('set-haptic-title').textContent = t('setHapticTitle');
+  updateHapticBtnText();
+  document.getElementById('btn-zoom-reset').textContent = t('zoomResetBtn');
+  document.getElementById('set-printer-title').textContent = t('setPrinterTitle');
+  document.getElementById('btn-check-printer').textContent = t('checkPrinterBtn');
+  document.getElementById('btn-test-print').textContent = t('testPrintBtn');
+  document.getElementById('printer-status-text').textContent = t('printerNote');
+  document.getElementById('settings-close-btn').textContent = t('closeBtn');
+
+  document.getElementById('tab-order').innerHTML = `<span class="icon-3d icon-3d-blue">🍽️</span><span>${t('tabOrder')}</span>`;
+  document.getElementById('tab-pos').innerHTML = `<span class="icon-3d icon-3d-amber">🧾</span><span>${t('tabPos')}</span> <span class="badge" id="active-order-badge">${activeOrders.length}</span>`;
+  document.getElementById('tab-account').innerHTML = `<span class="icon-3d icon-3d-green">📈</span><span>${t('tabAccount')}</span>`;
+  document.getElementById('tab-menu').innerHTML = `<span class="icon-3d icon-3d-amber">🍜</span><span>${t('tabMenu')}</span>`;
+
+  document.getElementById('table-bar-hint-prefix').textContent = t('tableHintPrefix');
+  document.getElementById('search-input').placeholder = t('searchPlaceholder');
+  document.getElementById('btn-menu-grid').textContent = t('gridBtn');
+  document.getElementById('btn-menu-col').textContent = t('colBtn');
+  document.getElementById('btn-pos-grid').textContent = t('gridBtn');
+  document.getElementById('btn-pos-col').textContent = t('colBtn');
+
+  document.getElementById('cart-sub-label').textContent = t('cartSubLabel');
+  document.getElementById('btn-custom-item').textContent = t('customItemBtn');
+  document.getElementById('btn-clear-cart').textContent = t('clearBtn');
+  document.getElementById('cart-total-label').textContent = t('totalLabel');
+  document.getElementById('btn-send-order').textContent = editingActiveOrderIdx >= 0 ? t('updateOrderBtn') : t('sendOrderBtn');
+
+  document.getElementById('pos-page-title').textContent = t('posPageTitle');
+  const sortEl = document.getElementById('pos-sort');
+  const prevSort = sortEl.value || 'newest';
+  sortEl.innerHTML = `<option value="newest">${t('sortNewest')}</option><option value="oldest">${t('sortOldest')}</option>`;
+  sortEl.value = prevSort;
+
+  document.getElementById('acc-page-title').textContent = t('accPageTitle');
+  document.getElementById('biz-day-label').textContent = t('bizDayLabel');
+  document.getElementById('biz-month-label').textContent = t('bizMonthLabel');
+  document.getElementById('biz-day-input').value = selectedBizDate;
+  document.getElementById('biz-month-input').value = selectedClosingMonth;
+  document.getElementById('btn-print-daily').textContent = t('printDailyBtn');
+  document.getElementById('btn-print-monthly').textContent = t('printMonthlyBtn');
+  document.getElementById('scope-day').textContent = t('scopeDay');
+  document.getElementById('scope-month').textContent = t('scopeMonth');
+  document.getElementById('scope-year').textContent = t('scopeYear');
+  document.getElementById('paid-hist-title').textContent = t('paidHistTitle');
+  document.getElementById('add-exp-title').textContent = t('addExpTitle');
+  document.getElementById('exp-amount').placeholder = t('expAmountPlaceholder');
+  document.getElementById('exp-note').placeholder = t('expNotePlaceholder');
+  document.getElementById('btn-save-exp').textContent = t('saveExpBtn');
+  document.getElementById('exp-hist-title').textContent = t('expHistTitle');
+
+  const catOptionsHtml = EXP_CATS.map(c => `<option value="${c.zh}">${lang === 'zh' ? c.zh : c.en}</option>`).join('');
+  document.getElementById('exp-cat').innerHTML = catOptionsHtml;
+  document.getElementById('edit-exp-cat').innerHTML = catOptionsHtml;
+
+  document.getElementById('edit-paid-modal-title').textContent = t('editPaidModalTitle');
+  document.getElementById('edit-paid-date-label').textContent = t('editPaidDateLabel');
+  document.getElementById('edit-paid-pay-label').textContent = t('editPaidPayLabel');
+  document.getElementById('edit-paid-total-label').textContent = t('editPaidTotalLabel');
+  document.getElementById('edit-paid-cancel-btn').textContent = t('cancelBtn');
+  document.getElementById('edit-paid-save-btn').textContent = t('saveBtn');
+
+  document.getElementById('edit-exp-modal-title').textContent = t('editExpModalTitle');
+  document.getElementById('edit-exp-cat-label').textContent = t('editExpCatLabel');
+  document.getElementById('edit-exp-date-label').textContent = t('editExpDateLabel');
+  document.getElementById('edit-exp-amt-label').textContent = t('editExpAmtLabel');
+  document.getElementById('edit-exp-note-label').textContent = t('editExpNoteLabel');
+  document.getElementById('edit-exp-cancel-btn').textContent = t('cancelBtn');
+  document.getElementById('edit-exp-save-btn').textContent = t('saveBtn');
+
+  document.getElementById('menu-mgr-title').textContent = t('menuMgrTitle');
+  document.getElementById('auto-sync-hint').textContent = t('autoSyncHint');
+  document.getElementById('btn-export-sync').textContent = t('exportSyncBtn');
+  document.getElementById('btn-import-sync').textContent = t('importSyncBtn');
+  document.getElementById('add-new-dish-title').textContent = t('addNewDishTitle');
+  document.getElementById('new-dish-code').placeholder = t('newDishCodePlaceholder');
+  document.getElementById('new-dish-cn').placeholder = t('newDishCnPlaceholder');
+  document.getElementById('new-dish-en').placeholder = t('newDishEnPlaceholder');
+  document.getElementById('new-dish-price').placeholder = t('newDishPricePlaceholder');
+  document.getElementById('new-dish-photo-btn').textContent = t('newDishPhotoBtn');
+  document.getElementById('btn-create-dish').textContent = t('createDishBtn');
+  document.getElementById('mgr-search-input').placeholder = t('mgrSearchPlaceholder');
+  document.getElementById('new-dish-cat').innerHTML = CATEGORIES.filter(c => c.key !== '全部').map(c => `<option value="${c.key}">${lang === 'zh' ? c.zh : c.en}</option>`).join('');
+
+  document.getElementById('opt-cancel-btn').textContent = t('cancelBtn');
+  document.getElementById('opt-confirm-btn').textContent = t('addBtn');
+  document.getElementById('custom-modal-title').textContent = t('customModalTitle');
+  document.getElementById('custom-name-label').textContent = t('customNameLabel');
+  document.getElementById('custom-item-name').placeholder = t('customNamePlaceholder');
+  document.getElementById('custom-price-label').textContent = t('customPriceLabel');
+  document.getElementById('custom-cancel-btn').textContent = t('cancelBtn');
+  document.getElementById('custom-confirm-btn').textContent = t('addBtn');
+  document.getElementById('remark-modal-title').textContent = t('remarkModalTitle');
+  document.getElementById('remark-custom').placeholder = t('remarkCustomPlaceholder');
+  document.getElementById('remark-cancel-btn').textContent = t('cancelBtn');
+  document.getElementById('remark-confirm-btn').textContent = t('confirmBtn');
+  document.getElementById('edit-price-modal-title').textContent = t('editPriceModalTitle');
+  document.getElementById('edit-price-label').textContent = t('editPriceLabel');
+  document.getElementById('edit-price-cancel-btn').textContent = t('cancelBtn');
+  document.getElementById('edit-price-save-btn').textContent = t('saveBtn');
+  document.getElementById('edit-name-modal-title').textContent = t('editNameModalTitle');
+  document.getElementById('edit-cn-label').textContent = t('editCnLabel');
+  document.getElementById('edit-en-label').textContent = t('editEnLabel');
+  document.getElementById('edit-name-cancel-btn').textContent = t('cancelBtn');
+  document.getElementById('edit-name-save-btn').textContent = t('saveBtn');
+  document.getElementById('cash-modal-title').textContent = t('cashModalTitle');
+  document.getElementById('cash-table-label').textContent = t('cashTableLabel');
+  document.getElementById('cash-due-label').textContent = t('cashDueLabel');
+  document.getElementById('cash-given-label').textContent = t('cashGivenLabel');
+  document.getElementById('cash-cancel-btn').textContent = `✕ ${t('cancelBtn')}`;
+  document.getElementById('cash-exact-btn').textContent = t('cashExactBtn');
+  document.getElementById('cash-confirm-btn').textContent = t('cashConfirmBtn');
+  const pTitle = document.getElementById('platform-order-title');
+  const pRef = document.getElementById('platform-order-ref');
+  const pAmt = document.getElementById('platform-order-amt');
+  const pBtn = document.getElementById('btn-add-platform');
+  if (pTitle) pTitle.textContent = t('platformTitle');
+  if (pRef) pRef.placeholder = t('platformRefPlaceholder');
+  if (pAmt) pAmt.placeholder = t('platformAmtPlaceholder');
+  if (pBtn) pBtn.textContent = t('platformAddBtn');
+}
+
+function compressImageFile(file, callback) {
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const img = new Image();
+    img.onload = function() {
+      const maxDim = 640;
+      let w = img.width, h = img.height;
+      if (w > h && w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; }
+      else if (h >= w && h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', 0.78));
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function handleNewDishPhoto(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  compressImageFile(file, (dataUrl) => {
+    newDishPhotoDataUrl = dataUrl;
+    document.getElementById('new-dish-photo-status').textContent = lang === 'zh' ? `已选照片：${file.name}` : `Photo ready: ${file.name}`;
+  });
+}
+function createNewDish() {
+  const cat = document.getElementById('new-dish-cat').value;
+  const cn = document.getElementById('new-dish-cn').value.trim();
+  const en = document.getElementById('new-dish-en').value.trim();
+  const price = parseFloat(document.getElementById('new-dish-price').value);
+  let code = document.getElementById('new-dish-code').value.trim().toUpperCase();
+  if ((!cn && !en) || isNaN(price) || price < 0) {
+    showAlert(lang === 'zh' ? '请填写名称与有效价格！' : 'Please enter name and valid price.');
+    return;
+  }
+  const all = getMergedMenu();
+  if (!code) {
+    const prefix = cat === '饮料' ? 'D' : (cat === '甜品' ? 'A' : (cat === '小食' ? 'SD' : 'M'));
+    let n = 100;
+    while (all.some(x => x.code === `${prefix}${n}`)) n++;
+    code = `${prefix}${n}`;
+  } else if (all.some(x => x.code === code)) {
+    showAlert(lang === 'zh' ? `编号 ${code} 已存在！` : `Code ${code} already exists.`);
+    return;
+  }
+  extraMenuItems.push({ code, cat, cn: cn || en, en: en || cn, price, img: newDishPhotoDataUrl || '', isCustomDish: true });
+  localStorage.setItem('rainbow_extra_menu_items', JSON.stringify(extraMenuItems)); invalidateMenuCache();
+  broadcastMenuUpdate();
+  document.getElementById('new-dish-code').value = '';
+  document.getElementById('new-dish-cn').value = '';
+  document.getElementById('new-dish-en').value = '';
+  document.getElementById('new-dish-price').value = '';
+  document.getElementById('new-dish-photo-input').value = '';
+  document.getElementById('new-dish-photo-status').textContent = '';
+  newDishPhotoDataUrl = '';
+  renderMenu(); renderMenuManager();
+}
+function uploadPhotoForItem(code, file) {
+  if (!file) return;
+  compressImageFile(file, (dataUrl) => {
+    const extraIdx = extraMenuItems.findIndex(x => x.code === code);
+    if (extraIdx >= 0) {
+      extraMenuItems[extraIdx].img = dataUrl;
+      localStorage.setItem('rainbow_extra_menu_items', JSON.stringify(extraMenuItems)); invalidateMenuCache();
+    } else {
+      customMenuOverrides[code] = { ...(customMenuOverrides[code] || {}), img: dataUrl };
+      localStorage.setItem('rainbow_menu_overrides', JSON.stringify(customMenuOverrides)); invalidateMenuCache();
+    }
+    broadcastMenuUpdate(); renderMenu(); renderMenuManager();
+  });
+}
+function openEditPriceModal(code) {
+  const item = getMenuItemByCode(code);
+  if (!item) return;
+  editingPriceCode = code;
+  document.getElementById('edit-price-modal-title').textContent = `${t('editPriceModalTitle')} — ${item.code} ${itemTitle(item)}`;
+  document.getElementById('edit-price-input').value = String(item.price);
+  document.getElementById('edit-price-modal').classList.add('show');
+}
+function saveEditedItemPrice() {
+  if (!editingPriceCode) return;
+  const val = parseFloat(document.getElementById('edit-price-input').value);
+  if (isNaN(val) || val < 0) return;
+  const extraIdx = extraMenuItems.findIndex(x => x.code === editingPriceCode);
+  if (extraIdx >= 0) {
+    extraMenuItems[extraIdx].price = val;
+    localStorage.setItem('rainbow_extra_menu_items', JSON.stringify(extraMenuItems)); invalidateMenuCache();
+  } else {
+    customMenuOverrides[editingPriceCode] = { ...(customMenuOverrides[editingPriceCode] || {}), price: val };
+    localStorage.setItem('rainbow_menu_overrides', JSON.stringify(customMenuOverrides)); invalidateMenuCache();
+  }
+  broadcastMenuUpdate(); closeModal('edit-price-modal'); editingPriceCode = null;
+  renderMenu(); renderMenuManager();
+}
+function openEditNameModal(code) {
+  const item = getMenuItemByCode(code);
+  if (!item) return;
+  editingNameCode = code;
+  document.getElementById('edit-name-modal-title').textContent = `${t('editNameModalTitle')} (${item.code})`;
+  document.getElementById('edit-item-cn').value = item.cn;
+  document.getElementById('edit-item-en').value = item.en;
+  document.getElementById('edit-name-modal').classList.add('show');
+}
+function saveEditedItemName() {
+  if (!editingNameCode) return;
+  const baseItem = BASE_MENU.find(m => m.code === editingNameCode);
+  const cnVal = document.getElementById('edit-item-cn').value.trim();
+  const enVal = document.getElementById('edit-item-en').value.trim();
+  const extraIdx = extraMenuItems.findIndex(x => x.code === editingNameCode);
+  if (extraIdx >= 0) {
+    if (cnVal) extraMenuItems[extraIdx].cn = cnVal;
+    if (enVal) extraMenuItems[extraIdx].en = enVal;
+    localStorage.setItem('rainbow_extra_menu_items', JSON.stringify(extraMenuItems)); invalidateMenuCache();
+  } else if (baseItem) {
+    customMenuOverrides[editingNameCode] = { ...(customMenuOverrides[editingNameCode] || {}), cn: cnVal || baseItem.cn, en: enVal || baseItem.en };
+    localStorage.setItem('rainbow_menu_overrides', JSON.stringify(customMenuOverrides)); invalidateMenuCache();
+  }
+  broadcastMenuUpdate(); closeModal('edit-name-modal'); editingNameCode = null;
+  renderMenu(); renderMenuManager();
+}
+function resetSingleItemName() {
+  if (!editingNameCode) return;
+  const baseItem = BASE_MENU.find(m => m.code === editingNameCode);
+  if (!baseItem) return;
+  if (customMenuOverrides[editingNameCode]) {
+    delete customMenuOverrides[editingNameCode].cn;
+    delete customMenuOverrides[editingNameCode].en;
+    localStorage.setItem('rainbow_menu_overrides', JSON.stringify(customMenuOverrides)); invalidateMenuCache();
+  }
+  broadcastMenuUpdate();
+  document.getElementById('edit-item-cn').value = baseItem.cn;
+  document.getElementById('edit-item-en').value = baseItem.en;
+  renderMenu(); renderMenuManager();
+}
+function deleteCustomDish(code) {
+  showConfirm(lang === 'zh' ? `确定删除新增菜品 ${code}？` : `Delete ${code}?`, () => {
+    extraMenuItems = extraMenuItems.filter(x => x.code !== code);
+    localStorage.setItem('rainbow_extra_menu_items', JSON.stringify(extraMenuItems)); invalidateMenuCache();
+    broadcastMenuUpdate(); renderMenu(); renderMenuManager();
+  });
+}
+function exportMenuSyncFile() {
+  const payload = { app: 'RainbowPOSMenuSync', exportedAt: formatDashDate(new Date()), overrides: customMenuOverrides, extraItems: extraMenuItems };
+  const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `rainbow-menu-sync-${formatDashDate(selectedBizDate)}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 500);
+}
+function importMenuSyncFile(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.overrides) {
+        customMenuOverrides = { ...customMenuOverrides, ...data.overrides };
+        localStorage.setItem('rainbow_menu_overrides', JSON.stringify(customMenuOverrides)); invalidateMenuCache();
+      }
+      if (Array.isArray(data.extraItems)) {
+        const map = new Map(extraMenuItems.map(x => [x.code, x]));
+        data.extraItems.forEach(x => map.set(x.code, x));
+        extraMenuItems = Array.from(map.values());
+        localStorage.setItem('rainbow_extra_menu_items', JSON.stringify(extraMenuItems)); invalidateMenuCache();
+      }
+      broadcastMenuUpdate(); renderMenu(); renderMenuManager();
+      showAlert(lang === 'zh' ? '同步包导入成功！' : 'Imported!');
+    } catch (err) {
+      showAlert(lang === 'zh' ? '同步文件格式错误！' : 'Invalid file.');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+}
+function formatMenuCatLabel(catKey) {
+  const found = (typeof CATEGORIES !== 'undefined' ? CATEGORIES : []).find(c => c.key === catKey);
+  if (found) return lang === 'zh' ? found.zh : found.en;
+  const fallbackMap = {
+    '全部': { zh: '全部', en: 'All' },
+    '西餐': { zh: '西餐', en: 'Western' },
+    '面类': { zh: '面类', en: 'Noodles' },
+    '饭类': { zh: '饭类', en: 'Rice' },
+    '甜品': { zh: '甜品', en: 'Dessert' },
+    '饮料': { zh: '饮料', en: 'Drinks' },
+    '小食': { zh: '小食', en: 'Snacks' }
+  };
+  const fb = fallbackMap[catKey];
+  return fb ? (lang === 'zh' ? fb.zh : fb.en) : (catKey || '');
+}
+function renderMenuManager() {
+  const listEl = document.getElementById('menu-mgr-list');
+  if (!listEl) return;
+  const kw = (document.getElementById('mgr-search-input')?.value || '').trim().toLowerCase();
+  const items = getMergedMenu().filter(m => !kw || m.code.toLowerCase().includes(kw) || m.cn.toLowerCase().includes(kw) || m.en.toLowerCase().includes(kw));
+  listEl.innerHTML = items.map(item => {
+    const thumb = item.img ? `<img class="mgr-thumb" loading="lazy" decoding="async" src="${item.img}" alt="${itemTitle(item)}" />` : `<div class="mgr-thumb">${item.code}</div>`;
+    return `
+      <div class="mgr-item-row">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">
+          ${thumb}
+          <div>
+            <div><b>${item.code}</b> · <span style="color:var(--muted);font-size:0.8rem;">${formatMenuCatLabel(item.cat)}</span></div>
+            <div style="font-weight:600;">${itemTitle(item)}</div>
+            <div style="font-size:0.85rem;color:var(--price-color);font-weight:700;">RM ${Number(item.price || 0).toFixed(2)}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+          <button type="button" class="mini-btn" onclick="openEditPriceModal('${item.code}')">${t('priceBtn')}</button>
+          <button type="button" class="mini-btn" onclick="openEditNameModal('${item.code}')">${t('editBtn')}</button>
+          <label class="mini-btn" style="cursor:pointer;">
+            ${t('uploadPhotoBtn')}
+            <input type="file" accept="image/*" style="display:none;" onchange="uploadPhotoForItem('${item.code}', this.files[0])" />
+          </label>
+          ${item.isCustomDish ? `<button type="button" class="mini-btn del" style="margin-left:0;" onclick="deleteCustomDish('${item.code}')">${t('delBtn')}</button>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function showAlert(msg, title = '', onOk = null) {
+  document.getElementById('ui-dialog-title').textContent = title || (lang === 'zh' ? '提示' : 'Notice');
+  document.getElementById('ui-dialog-msg').textContent = msg;
+  const actions = document.getElementById('ui-dialog-actions');
+  actions.innerHTML = `<button class="mini-btn" style="background:var(--primary);color:#f8fafc;padding:7px 14px;" id="ui-ok-btn">${t('confirmBtn')}</button>`;
+  document.getElementById('ui-dialog-modal').classList.add('show');
+  document.getElementById('ui-ok-btn').onclick = () => { closeModal('ui-dialog-modal'); if (typeof onOk === 'function') onOk(); };
+}
+function showConfirm(msg, onConfirm, title = '') {
+  document.getElementById('ui-dialog-title').textContent = title || (lang === 'zh' ? '请确认' : 'Confirm');
+  document.getElementById('ui-dialog-msg').textContent = msg;
+  const actions = document.getElementById('ui-dialog-actions');
+  actions.innerHTML = `
+    <button class="mini-btn" style="padding:7px 12px;" id="ui-cancel-btn">${t('cancelBtn')}</button>
+    <button class="mini-btn del" style="margin-left:0;padding:7px 14px;" id="ui-confirm-btn">${t('confirmBtn')}</button>
+  `;
+  document.getElementById('ui-dialog-modal').classList.add('show');
+  document.getElementById('ui-cancel-btn').onclick = () => closeModal('ui-dialog-modal');
+  document.getElementById('ui-confirm-btn').onclick = () => { closeModal('ui-dialog-modal'); if (typeof onConfirm === 'function') onConfirm(); };
+}
+
+function init() {
+  setupPwaSupport();
+  setupScrollAutoCollapseHeader();
+  window.addEventListener('online', updateWifiStatus);
+  window.addEventListener('offline', updateWifiStatus);
+  applyZoom(); applyI18n(); startClock();
+  renderTables(); renderCats(); renderMenu(); renderCart(); renderPOS(); renderAccounting(); renderMenuManager();
+}
+
+function startClock() {
+  const tick = () => {
+    const d = new Date();
+    const clockEl = document.getElementById('clock-text');
+    if (!clockEl) return;
+    const dayStr = String(d.getDate()).padStart(2, '0');
+    const monStr = MONTHS_SHORT[d.getMonth()];
+    let hr = d.getHours();
+    const min = String(d.getMinutes()).padStart(2, '0');
+    const sec = String(d.getSeconds()).padStart(2, '0');
+    const ampm = hr >= 12 ? 'PM' : 'AM';
+    hr = hr % 12;
+    if (hr === 0) hr = 12;
+    clockEl.textContent = `${dayStr}-${monStr}-${d.getFullYear()} ${String(hr).padStart(2, '0')}:${min}:${sec} ${ampm}`;
+  };
+  tick();
+  setInterval(tick, 1000);
+}
+
+function switchPage(pageId, btn) {
+  document.getElementById('main-header').classList.remove('header-scrolled');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (pageId === 'pos') renderPOS();
+  if (pageId === 'account') renderAccounting();
+  if (pageId === 'menu') renderMenuManager();
+}
+
+function setMenuLayout(mode) {
+  menuLayout = mode;
+  document.getElementById('btn-menu-grid').classList.toggle('active', mode === 'grid');
+  document.getElementById('btn-menu-col').classList.toggle('active', mode === 'column');
+  document.getElementById('menu-grid').className = mode === 'grid' ? 'menu-grid' : 'menu-column';
+  renderMenu();
+}
+function setPosLayout(mode) {
+  posLayout = mode;
+  document.getElementById('btn-pos-grid').classList.toggle('active', mode === 'grid');
+  document.getElementById('btn-pos-col').classList.toggle('active', mode === 'column');
+  document.getElementById('pos-orders-grid').className = mode === 'grid' ? 'pos-grid' : 'pos-column';
+  renderPOS();
+}
+function formatTableLabel(code) {
+  if (code === 'TAKEAWAY') return t('takeaway');
+  return lang === 'zh' ? `${code}号` : `Table ${code}`;
+}
+function renderTables() {
+  document.getElementById('table-grid').innerHTML = TABLES.map(code => {
+    const isTakeaway = code === 'TAKEAWAY';
+    const sel = selectedTables.includes(code) ? 'selected' : '';
+    return `<button class="tbl-btn ${isTakeaway ? 'takeaway' : ''} ${sel}" onclick="triggerHaptic(); toggleTable('${code}');">${formatTableLabel(code)}</button>`;
+  }).join('');
+  updateTableLabel();
+}
+function toggleTable(code) {
+  if (code === 'TAKEAWAY') selectedTables = selectedTables.includes(code) ? [] : [code];
+  else {
+    selectedTables = selectedTables.filter(x => x !== 'TAKEAWAY');
+    if (selectedTables.includes(code)) selectedTables = selectedTables.filter(x => x !== code);
+    else selectedTables.push(code);
+  }
+  const isTakeaway = isTakeawayMode();
+  cart.forEach(item => { if (item.mustPackFee) item.packFee = isTakeaway ? 0.5 : 0; });
+  renderTables(); renderCart();
+}
+function isTakeawayMode() { return selectedTables.includes('TAKEAWAY'); }
+function getTableDisplay() {
+  if (selectedTables.length === 0) return t('noTable');
+  if (isTakeawayMode()) return t('takeaway');
+  return selectedTables.map(formatTableLabel).join(' + ');
+}
+function updateTableLabel() {
+  const label = getTableDisplay();
+  document.getElementById('selected-table-hint').textContent = label;
+  document.getElementById('cart-table-display').textContent = label;
+}
+function renderCats() {
+  document.getElementById('cat-tabs').innerHTML = CATEGORIES.map(c =>
+    `<button class="cat-btn ${c.key === currentCat ? 'active' : ''}" onclick="triggerHaptic(); selectCat('${c.key}');">${lang === 'zh' ? c.zh : c.en}</button>`
+  ).join('');
+}
+function selectCat(c) {
+  currentCat = c;
+  document.getElementById('search-input').value = '';
+  renderCats(); renderMenu();
+}
+function renderMenu() {
+  const kw = document.getElementById('search-input').value.trim().toLowerCase();
+  const list = getMergedMenu().filter(item => {
+    const matchKw = !kw || item.code.toLowerCase().includes(kw) || item.cn.toLowerCase().includes(kw) || item.en.toLowerCase().includes(kw);
+    if (kw) return matchKw;
+    return currentCat === '全部' || item.cat === currentCat;
+  });
+  document.getElementById('menu-grid').innerHTML = list.map(item => {
+    let priceText = `RM ${Number(item.price || 0).toFixed(2)}`;
+    if (item.marketPrice) priceText = t('marketPriceLabel');
+    else if (item.singleScoopOptions) priceText = 'RM 4.50 / 5.00';
+    else if (item.noIcePrice) priceText = `${t('iceLabel')} RM${Number(item.price).toFixed(2)} / ${t('noIceLabel')} RM${Number(item.noIcePrice).toFixed(2)}`;
+    const imgHtml = item.img
+      ? `<img class="food-thumb" loading="lazy" decoding="async" src="${item.img}" alt="${itemTitle(item)}" onerror="this.style.display='none'" />`
+      : `<div class="food-thumb-placeholder">${item.code} ${t('imgPlaceholder')}</div>`;
+    return `
+      <div class="menu-card" onclick="triggerHaptic(); handleItemClick('${item.code}');">
+        ${imgHtml}
+        <div class="item-info">
+          <span class="item-code">${item.code}</span>
+          <div class="item-name">${itemTitle(item)}</div>
+        </div>
+        <div class="item-price">${priceText}</div>
+      </div>
+    `;
+  }).join('');
+}
+function handleItemClick(code) {
+  const item = getMenuItemByCode(code);
+  if (!item) return;
+  if (item.noodleOptions || item.sauces || item.marketPrice || item.addon || item.noIcePrice || item.flavorOptions || item.singleScoopOptions) openOptionModal(item);
+  else addToCart(item, item.price, '');
+}
+function openOptionModal(item) {
+  document.getElementById('opt-modal-title').textContent = `${item.code} ${itemTitle(item)}`;
+  const body = document.getElementById('opt-modal-body');
+  let html = '';
+  if (item.noodleOptions) html += `<div style="margin-bottom:10px;"><div style="font-weight:700;margin-bottom:6px;">${lang === 'zh' ? '请选择面类 / 白饭：' : 'Select Noodle / Rice:'}</div>${item.noodleOptions.map((n, idx) => `<label style="display:block;margin-bottom:5px;"><input type="radio" name="noodleOpt" value="${idx}" ${idx === 0 ? 'checked' : ''} /> ${optText(n)}</label>`).join('')}</div>`;
+  if (item.singleScoopOptions) html += `<div style="margin-bottom:10px;"><div style="font-weight:700;margin-bottom:6px;">${lang === 'zh' ? '请选择雪糕口味：' : 'Select Scoop Flavor:'}</div>${item.singleScoopOptions.map((f, idx) => `<label style="display:block;margin-bottom:5px;"><input type="radio" name="scoopOpt" value="${idx}" ${idx === 0 ? 'checked' : ''} /> ${lang === 'zh' ? f.zh : f.en} (RM ${f.price.toFixed(2)})</label>`).join('')}</div>`;
+  if (item.flavorOptions) html += `<div style="margin-bottom:10px;"><div style="font-weight:700;margin-bottom:6px;">${lang === 'zh' ? '请选择雪糕口味：' : 'Select Flavor:'}</div>${item.flavorOptions.map((f, idx) => `<label style="display:block;margin-bottom:5px;"><input type="radio" name="flavorOpt" value="${idx}" ${idx === 0 ? 'checked' : ''} /> ${lang === 'zh' ? f.zh : f.en}${f.extra > 0 ? ` (+RM ${f.extra.toFixed(2)})` : ''}</label>`).join('')}</div>`;
+  if (item.marketPrice) html += `<div style="margin-bottom:10px;"><label>${lang === 'zh' ? '请输入时价 (RM)：' : 'Market Price (RM):'}</label><input type="number" id="opt-market-price" class="search-box" style="margin-top:6px;" value="35" step="0.5" /></div>`;
+  if (item.noIcePrice) html += `<div style="margin-bottom:10px;"><label><input type="radio" name="iceOpt" value="ice" checked /> ${t('iceLabel')} (RM ${item.price.toFixed(2)})</label><br/><label style="margin-top:6px;display:inline-block;"><input type="radio" name="iceOpt" value="noice" /> ${t('noIceLabel')} (RM ${item.noIcePrice.toFixed(2)})</label></div>`;
+  if (item.sauces) html += `<div style="margin-bottom:10px;"><div style="font-weight:700;margin-bottom:6px;">${lang === 'zh' ? '请选择口味/酱汁：' : 'Select Option:'}</div>${item.sauces.map((s, idx) => `<label style="display:block;margin-bottom:4px;"><input type="radio" name="sauceOpt" value="${idx}" ${idx === 0 ? 'checked' : ''} /> ${optText(s)}</label>`).join('')}</div>`;
+  if (item.addon) html += `<div style="margin-bottom:10px;"><label><input type="checkbox" id="opt-addon" /> ${optText(item.addon)} (+RM ${item.addon.price.toFixed(2)})</label></div>`;
+  body.innerHTML = html;
+  document.getElementById('opt-confirm-btn').onclick = () => {
+    let finalPrice = item.price;
+    let subNotes = [];
+    if (item.noodleOptions) subNotes.push(optText(item.noodleOptions[parseInt(document.querySelector('input[name="noodleOpt"]:checked').value, 10)]));
+    if (item.singleScoopOptions) { const c = item.singleScoopOptions[parseInt(document.querySelector('input[name="scoopOpt"]:checked').value, 10)]; finalPrice = c.price; subNotes.push(lang === 'zh' ? c.zh : c.en); }
+    if (item.flavorOptions) { const c = item.flavorOptions[parseInt(document.querySelector('input[name="flavorOpt"]:checked').value, 10)]; finalPrice += c.extra; subNotes.push(lang === 'zh' ? c.zh : c.en); }
+    if (item.marketPrice) finalPrice = parseFloat(document.getElementById('opt-market-price').value) || 0;
+    if (item.noIcePrice) { const v = document.querySelector('input[name="iceOpt"]:checked').value; if (v === 'noice') { finalPrice = item.noIcePrice; subNotes.push(t('noIceLabel')); } else subNotes.push(t('iceLabel')); }
+    if (item.sauces) subNotes.push(optText(item.sauces[parseInt(document.querySelector('input[name="sauceOpt"]:checked').value, 10)]));
+    if (item.addon && document.getElementById('opt-addon').checked) { finalPrice += item.addon.price; subNotes.push(optText(item.addon)); }
+    addToCart(item, finalPrice, subNotes.join(', '));
+    closeModal('option-modal');
+  };
+  document.getElementById('option-modal').classList.add('show');
+}
+function openCustomItemModal() {
+  document.getElementById('custom-item-name').value = '';
+  document.getElementById('custom-item-price').value = '';
+  document.getElementById('custom-item-modal').classList.add('show');
+}
+function addCustomItemToCart() {
+  const name = document.getElementById('custom-item-name').value.trim();
+  const price = parseFloat(document.getElementById('custom-item-price').value);
+  if (!name || isNaN(price) || price <= 0) return;
+  cart.push({ code: 'CUSTOM', cat: '自定', cn: name, en: name, basePrice: price, qty: 1, spec: '', extraRice: 0, extraNoodle: 0, eggCount: 0, sausageCount: 0, packFee: 0, mustPackFee: false, redeemed: false, remark: '' });
+  closeModal('custom-item-modal'); renderCart();
+}
+function addToCart(item, unitPrice, spec) {
+  const autoPack = (item.mustPackFee && isTakeawayMode()) ? 0.5 : 0;
+  cart.push({ code: item.code, cat: item.cat, cn: item.cn, en: item.en, basePrice: unitPrice, qty: 1, spec, extraRice: 0, extraNoodle: 0, eggCount: 0, sausageCount: 0, packFee: autoPack, mustPackFee: !!item.mustPackFee, redeemed: false, remark: '' });
+  renderCart();
+}
+function getItemUnitExtra(item) {
+  let extra = 0;
+  if (item.extraRice) extra += (item.code === 'R1' ? 2.5 : (item.cat === '西餐' ? 2.5 : 4));
+  if (item.extraNoodle) extra += 4;
+  if (item.eggCount) extra += item.eggCount * 1.5;
+  if (item.sausageCount) extra += item.sausageCount * 1.5;
+  extra += (item.packFee || 0);
+  return extra;
+}
+function getCartItemRowTotal(item) {
+  if (item.redeemed) return 0;
+  return (item.basePrice + getItemUnitExtra(item)) * item.qty;
+}
+function renderCart() {
+  const sendBtn = document.getElementById('btn-send-order');
+  if (sendBtn) sendBtn.textContent = editingActiveOrderIdx >= 0 ? t('updateOrderBtn') : t('sendOrderBtn');
+  const listEl = document.getElementById('cart-list');
+  if (cart.length === 0) {
+    listEl.innerHTML = `<div style="text-align:center;color:var(--muted);margin-top:40px;">${lang === 'zh' ? '点击左侧菜品加入订单' : 'Tap menu items to add'}</div>`;
+    document.getElementById('cart-total').textContent = 'RM 0.00';
+    return;
+  }
+  let grandTotal = 0;
+  listEl.innerHTML = cart.map((item, idx) => {
+    const rowTotal = getCartItemRowTotal(item);
+    grandTotal += rowTotal;
+    const riceFee = item.code === 'R1' ? 2.5 : (item.cat === '西餐' ? 2.5 : 4);
+    const extrasText = [
+      item.spec,
+      item.extraRice ? `${lang === 'zh' ? '加饭' : 'Rice'} +RM${riceFee.toFixed(2)}` : '',
+      item.extraNoodle ? `${lang === 'zh' ? '加面' : 'Noodle'} +RM4.00` : '',
+      item.eggCount ? `${lang === 'zh' ? '太阳蛋' : 'Egg'} ×${item.eggCount}` : '',
+      item.sausageCount ? `${lang === 'zh' ? '香肠' : 'Sausage'} ×${item.sausageCount}` : '',
+      item.packFee > 0 ? `${t('takeaway')} +RM${item.packFee.toFixed(2)}` : ''
+    ].filter(Boolean);
+    const notes = formatRedeemAndRemark(item).filter(x => x !== t('redeemedTag'));
+    return `
+      <div class="cart-item">
+        <div class="cart-item-top">
+          <div>
+            <div class="cart-item-name">${item.code} ${itemTitle(item)}</div>
+            ${extrasText.length ? `<div class="cart-item-sub">${extrasText.join(' · ')}</div>` : ''}
+            ${item.redeemed ? `<div class="redeem-badge">${t('redeemedTag')}</div>` : ''}
+            ${notes.length ? `<div class="cart-item-sub" style="color:var(--primary);">${notes.join(' · ')}</div>` : ''}
+          </div>
+          <div style="font-weight:700;color:${item.redeemed ? '#059669' : 'var(--price-color)'};">RM ${rowTotal.toFixed(2)}</div>
+        </div>
+        <div class="cart-item-actions">
+          <div class="qty-box">
+            <button class="qty-btn" onclick="triggerHaptic(); changeQty(${idx}, -1);">-</button>
+            <span style="font-weight:700;">${item.qty}</span>
+            <button class="qty-btn" onclick="triggerHaptic(); changeQty(${idx}, 1);">+</button>
+          </div>
+          ${['西餐', '饭类'].includes(item.cat) ? `<button class="mini-btn ${item.extraRice ? 'active' : ''}" onclick="triggerHaptic(); toggleRice(${idx});">+${lang === 'zh' ? '加饭' : 'Rice'} RM${riceFee.toFixed(2)}</button>` : ''}
+          ${item.cat === '面类' ? `<button class="mini-btn ${item.extraNoodle ? 'active' : ''}" onclick="triggerHaptic(); toggleNoodle(${idx});">+${lang === 'zh' ? '加面' : 'Noodle'} RM4</button>` : ''}
+          ${item.cat === '西餐' ? `<button class="mini-btn ${item.eggCount ? 'active' : ''}" onclick="triggerHaptic(); addEgg(${idx});">+${lang === 'zh' ? '太阳蛋' : 'Egg'} RM1.5</button><button class="mini-btn ${item.sausageCount ? 'active' : ''}" onclick="triggerHaptic(); addSausage(${idx});">+${lang === 'zh' ? '香肠' : 'Sausage'} RM1.5</button>` : ''}
+          ${item.cat === '饮料' && !item.mustPackFee ? `<button class="mini-btn ${item.packFee > 0 ? 'active' : ''}" onclick="triggerHaptic(); togglePackFee(${idx});">+RM0.50 ${t('takeaway')}</button>` : ''}
+          <button class="mini-btn ${item.redeemed || item.remark ? 'active' : ''}" onclick="triggerHaptic(); openRemarkModal(${idx});">${lang === 'zh' ? '备注' : 'Note'}</button>
+          <button class="mini-btn del" onclick="triggerHaptic(); removeCartItem(${idx});">${t('delBtn')}</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('cart-total').textContent = `RM ${grandTotal.toFixed(2)}`;
+}
+function changeQty(idx, delta) { cart[idx].qty += delta; if (cart[idx].qty <= 0) cart.splice(idx, 1); renderCart(); }
+function toggleRice(idx) { cart[idx].extraRice = cart[idx].extraRice ? 0 : 1; renderCart(); }
+function toggleNoodle(idx) { cart[idx].extraNoodle = cart[idx].extraNoodle ? 0 : 1; renderCart(); }
+function addEgg(idx) { cart[idx].eggCount = (cart[idx].eggCount || 0) + 1; renderCart(); }
+function addSausage(idx) { cart[idx].sausageCount = (cart[idx].sausageCount || 0) + 1; renderCart(); }
+function togglePackFee(idx) { cart[idx].packFee = cart[idx].packFee > 0 ? 0 : 0.5; renderCart(); }
+function removeCartItem(idx) { cart.splice(idx, 1); renderCart(); }
+function clearCart() { cart = []; editingActiveOrderIdx = -1; editingOrderBizDate = null; renderCart(); }
+
+function openRemarkModal(idx) {
+  editingRemarkIndex = idx;
+  const item = cart[idx];
+  const existing = (item && item.remark) ? String(item.remark) : '';
+  const sepRegex = /[,，、·]+/;
+  const rawParts = existing
+    .split(sepRegex)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  selectedRemarkTags = [];
+  if (item && item.redeemed) {
+    selectedRemarkTags.push(lang === 'zh' ? '兑换 Redeemed' : 'Stamp Redeemed');
+  }
+
+  const presetLabels = new Set([
+    ...(typeof REMARK_PRESETS !== 'undefined' ? REMARK_PRESETS.flatMap(t => [t.zh, t.en]) : []),
+    '打包', 'Takeaway', '少冰', 'Less Ice', '去冰', 'No Ice',
+    '少甜', 'Less Sweet', '走甜', 'No Sweet', '不辣', 'No Spicy',
+    '加辣', 'Extra Spicy', '分开酱汁', 'Sauce Separate'
+  ]);
+
+  const customParts = [];
+  rawParts.forEach(part => {
+    if (part === '兑换 Redeemed' || part === 'Stamp Redeemed') {
+      if (!selectedRemarkTags.includes(part)) selectedRemarkTags.push(part);
+    } else if (presetLabels.has(part)) {
+      if (!selectedRemarkTags.includes(part)) selectedRemarkTags.push(part);
+    } else {
+      customParts.push(part);
+    }
+  });
+
+  document.getElementById('remark-custom').value = customParts.join(', ');
+  renderRemarkTags();
+  document.getElementById('remark-modal').classList.add('show');
+}
+
+function isDrinkCartItem(item) {
+  if (!item) return false;
+  const menuMeta = typeof getMenuItemByCode === 'function' ? getMenuItemByCode(item.code) : null;
+  const cat = String(item.cat || menuMeta?.cat || '').trim().toLowerCase();
+  return cat === '饮料' || cat === 'drinks' || cat === 'drink' || cat === 'beverage' || cat === 'beverages';
+}
+
+function hasPaidDrinkSpec(item) {
+  if (!item) return false;
+  if (item.hasPaidVariants === true || item.hasIcePricing === true) return true;
+  const menuMeta = typeof getMenuItemByCode === 'function' ? getMenuItemByCode(item.code) : null;
+  if (menuMeta && (typeof menuMeta.noIcePrice === 'number' || (Array.isArray(menuMeta.options) && menuMeta.options.length > 1) || (Array.isArray(menuMeta.variants) && menuMeta.variants.length > 1))) {
+    return true;
+  }
+  const specText = String(item.spec || '');
+  return /冰|去冰|no ice|less ice/i.test(specText);
+}
+
+function getRemarkTagObjectsForCartItem(item) {
+  const catalog = {
+    redeem: { zh: '兑换 Redeemed', en: 'Stamp Redeemed' },
+    takeaway: { zh: '打包', en: 'Takeaway' },
+    lessSweet: { zh: '少甜', en: 'Less Sweet' },
+    noSweet: { zh: '走甜', en: 'No Sugar' },
+    lessIce: { zh: '少冰', en: 'Less Ice' },
+    noIce: { zh: '去冰', en: 'No Ice' },
+    noSpicy: { zh: '不辣', en: 'No Spicy' },
+    extraSpicy: { zh: '加辣', en: 'Extra Spicy' },
+    sauceSeparate: { zh: '分开酱汁', en: 'Sauce Separate' }
+  };
+
+  let keys = [];
+  if (!isDrinkCartItem(item)) {
+    // 1. 普通食物（非饮料分类）：不需要少冰、去冰、少甜、走甜
+    keys = ['takeaway', 'redeem', 'noSpicy', 'extraSpicy', 'sauceSeparate'];
+  } else if (hasPaidDrinkSpec(item)) {
+    // 3. 饮料分类 — 已有收费规格选项
+    keys = ['redeem', 'takeaway', 'lessIce', 'noIce', 'lessSweet', 'noSweet'];
+  } else {
+    // 2. 固定价格的饮料分类
+    keys = ['redeem', 'takeaway', 'lessSweet', 'noSweet', 'lessIce', 'noIce'];
+  }
+
+  return keys.map(k => catalog[k]).filter(Boolean);
+}
+
+function renderRemarkTags() {
+  const wrap = document.getElementById('remark-tags');
+  if (!wrap) return;
+  const isZh = lang === 'zh';
+  const currentItem = (typeof editingRemarkIndex === 'number' && editingRemarkIndex >= 0 && Array.isArray(cart))
+    ? cart[editingRemarkIndex]
+    : null;
+
+  const tagList = getRemarkTagObjectsForCartItem(currentItem);
+
+  wrap.innerHTML = tagList.map(tagObj => {
+    const label = isZh ? tagObj.zh : tagObj.en;
+    const altLabel = isZh ? tagObj.en : tagObj.zh;
+    const isActive = selectedRemarkTags.includes(label) || (altLabel && selectedRemarkTags.includes(altLabel));
+    const safeLabel = label.replace(/'/g, "\\'");
+    const activeStyle = isActive
+      ? 'background:#0d6efd;color:#ffffff;border-color:#0d6efd;'
+      : 'background:#ffffff;color:#111827;border-color:#d1d5db;';
+    return `<button type="button" class="tag-btn ${isActive ? 'active' : ''}" style="${activeStyle}" onclick="if(typeof triggerHaptic==='function')triggerHaptic(); toggleRemarkTag('${safeLabel}');">${label}</button>`;
+  }).join('');
+}
+
+function toggleRemarkTag(tag) {
+  const idx = selectedRemarkTags.indexOf(tag);
+  if (idx >= 0) {
+    selectedRemarkTags.splice(idx, 1);
+  } else {
+    selectedRemarkTags.push(tag);
+  }
+  renderRemarkTags();
+}
+
+function saveRemark() {
+  const custom = document.getElementById('remark-custom').value.trim();
+  const sep = lang === 'zh' ? '，' : ', ';
+  const isRedeem = selectedRemarkTags.some(x => x.includes('兑换') || x.toLowerCase().includes('redeemed'));
+  const otherTags = selectedRemarkTags.filter(x => !x.includes('兑换') && !x.toLowerCase().includes('redeemed'));
+  const combined = [...otherTags, ...(custom ? [custom] : [])].join(sep);
+
+  if (editingRemarkIndex >= 0 && cart[editingRemarkIndex]) {
+    const item = cart[editingRemarkIndex];
+    item.redeemed = isRedeem;
+    item.remark = combined;
+
+    const hasPack = combined.includes('打包') || combined.toLowerCase().includes('takeaway');
+    const catText = `${item.cat || ''} ${item.category || ''} ${item.cn || ''} ${item.en || ''}`.toLowerCase();
+    const isDessertOrShake =
+      catText.includes('甜品') ||
+      catText.includes('dessert') ||
+      catText.includes('奶昔') ||
+      catText.includes('milkshake') ||
+      catText.includes('milk shake');
+
+    item.packFee = (hasPack && isDessertOrShake) ? 0.5 : 0;
+  }
+
+  closeModal('remark-modal');
+  renderCart();
+}
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('show');
+}
+function cancelCashModal() {
+  pendingCashOrderIdx = -1;
+  document.getElementById('cash-given-input').value = '';
+  closeModal('cash-modal');
+}
+
+function submitOrder() {
+  if (selectedTables.length === 0 || cart.length === 0) {
+    showAlert(lang === 'zh' ? '请先选择桌号并加入菜品！' : 'Select table and items first.');
+    return;
+  }
+  let total = 0;
+  const itemsCopy = cart.map(item => {
+    const sub = getCartItemRowTotal(item);
+    total += sub;
+    return { ...item, subTotal: sub };
+  });
+  const now = new Date();
+  if (editingActiveOrderIdx >= 0 && activeOrders[editingActiveOrderIdx]) {
+    const oldOrd = activeOrders[editingActiveOrderIdx];
+    activeOrders[editingActiveOrderIdx] = {
+      ...oldOrd,
+      table: selectedTables.includes('TAKEAWAY') ? '打包' : selectedTables.join(' + '),
+      rawTables: [...selectedTables],
+      updatedAt: formatSpaceDate(now),
+      items: itemsCopy,
+      total
+    };
+    editingActiveOrderIdx = -1;
+    localStorage.setItem('rainbow_active_orders', JSON.stringify(activeOrders));
+    cart = []; selectedTables = [];
+    renderTables(); renderCart(); renderPOS();
+    showAlert(lang === 'zh' ? '桌单已更新！' : 'Order updated!');
+    return;
+  }
+  const targetBizDate = editingOrderBizDate || selectedBizDate || getDefaultBusinessDateStr(now);
+  activeOrders.unshift({
+    id: 'ORD-' + Date.now().toString().slice(-5),
+    table: selectedTables.includes('TAKEAWAY') ? '打包' : selectedTables.join(' + '),
+    rawTables: [...selectedTables],
+    createdAt: now.getTime(),
+    dateTimeStr: formatSpaceDate(targetBizDate),
+    bizDate: targetBizDate,
+    items: itemsCopy,
+    total
+  });
+  editingOrderBizDate = null;
+  localStorage.setItem('rainbow_active_orders', JSON.stringify(activeOrders));
+  cart = []; selectedTables = [];
+  renderTables(); renderCart(); renderPOS();
+  showAlert(lang === 'zh' ? `订单已送出（归属营业日 ${formatDashDate(targetBizDate)}）！` : `Order sent (Biz Date ${formatDashDate(targetBizDate)}).`);
+}
+
+function editActiveOrderInCart(idx) {
+  const ord = activeOrders[idx];
+  if (!ord) return;
+  editingActiveOrderIdx = idx;
+  editingOrderBizDate = ord.bizDate || null;
+  selectedTables = Array.isArray(ord.rawTables) && ord.rawTables.length
+    ? [...ord.rawTables]
+    : (ord.table === '打包' ? ['TAKEAWAY'] : ord.table.split('+').map(s => s.trim().replace('号', '').trim()).filter(Boolean));
+  cart = ord.items.map(i => ({ ...i }));
+  renderTables(); renderCart();
+  switchPage('order', document.getElementById('tab-order'));
+}
+
+function displayStoredTable(tableStr) {
+  if (!tableStr) return '';
+  if (tableStr === 'Foodpanda' || tableStr === 'Grabfood') return tableStr;
+  if (tableStr === '打包' || tableStr.includes('Takeaway')) return t('takeaway');
+  return tableStr.split('+').map(s => formatTableLabel(s.trim().replace('号', '').replace('Table', '').trim())).join(' + ');
+}
+
+function renderPOS() {
+  const badge = document.getElementById('active-order-badge');
+  if (badge) badge.textContent = activeOrders.length;
+  const grid = document.getElementById('pos-orders-grid');
+  if (activeOrders.length === 0) {
+    grid.innerHTML = `<div style="color:var(--muted);">${t('noActiveOrders')}</div>`;
+    return;
+  }
+  const sortBy = document.getElementById('pos-sort')?.value || 'newest';
+  const sorted = activeOrders.map((ord, realIdx) => ({ ord, realIdx }));
+  if (sortBy === 'oldest') sorted.sort((a, b) => (a.ord.createdAt || 0) - (b.ord.createdAt || 0));
+
+  grid.innerHTML = sorted.map(({ ord, realIdx }) => `
+    <div class="order-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--glass-line);padding-bottom:8px;gap:8px;flex-wrap:wrap;">
+        <span style="font-size:1.12rem;font-weight:700;">${displayStoredTable(ord.table)}</span>
+        <span style="font-size:0.78rem;color:var(--muted);font-family:monospace;">${ord.id} · ${formatSpaceDate(ord.bizDate || ord.createdAt || ord.dateTimeStr)}</span>
+      </div>
+      <div style="margin:10px 0;font-size:0.88rem;">
+        ${ord.items.map(i => `
+          <div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:4px;">
+            <span><b>${i.code} ${itemTitle(i)}</b> ×${i.qty}</span>
+            <span>RM ${(i.redeemed ? 0 : Number(i.subTotal || 0)).toFixed(2)}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div style="border-top:1px dashed var(--glass-line);padding-top:8px;display:flex;justify-content:space-between;font-weight:700;font-size:1.05rem;">
+        <span>${t('totalLabel')}</span>
+        <span style="color:var(--price-color);">RM ${Number(ord.total || 0).toFixed(2)}</span>
+      </div>
+      <div class="pay-btns">
+        <button class="pay-btn pay-cash" onclick="triggerHaptic(); openCashModal(${realIdx});">${t('cashBtn')}</button>
+        <button class="pay-btn pay-qr" onclick="triggerHaptic(); settleOrder(${realIdx}, 'DuitNow QR');">${t('qrBtn')}</button>
+        <button class="pay-btn pay-edit" onclick="triggerHaptic(); editActiveOrderInCart(${realIdx});">${t('editOrderBtn')}</button>
+        <button class="pay-btn pay-print" onclick="triggerHaptic(); printReceiptData(activeOrders[${realIdx}], 'Bill');">${t('printBtn')}</button>
+        <button class="pay-btn pay-del" onclick="triggerHaptic(); deleteActiveOrder(${realIdx});">${t('delBtn')}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function deleteActiveOrder(idx) {
+  const ord = activeOrders[idx];
+  showConfirm(lang === 'zh' ? `确定删除未结账桌单 ${displayStoredTable(ord.table)}？` : `Delete active order?`, () => {
+    activeOrders.splice(idx, 1);
+    localStorage.setItem('rainbow_active_orders', JSON.stringify(activeOrders));
+    renderPOS();
+  });
+}
+
+function openCashModal(idx) {
+  pendingCashOrderIdx = idx;
+  const ord = activeOrders[idx];
+  document.getElementById('cash-table-val').textContent = displayStoredTable(ord.table);
+  document.getElementById('cash-due-val').textContent = `RM ${Number(ord.total || 0).toFixed(2)}`;
+  const input = document.getElementById('cash-given-input');
+  input.value = '';
+  updateCashChangePreview();
+  document.getElementById('cash-modal').classList.add('show');
+  setTimeout(() => input.focus(), 80);
+}
+function updateCashChangePreview() {
+  if (pendingCashOrderIdx < 0 || !activeOrders[pendingCashOrderIdx]) return;
+  const due = Number(activeOrders[pendingCashOrderIdx].total || 0);
+  const rawVal = document.getElementById('cash-given-input').value.trim();
+  const preview = document.getElementById('cash-change-preview');
+  if (rawVal === '') {
+    preview.style.color = 'var(--muted)';
+    preview.textContent = lang === 'zh' ? '找零 Change：RM 0.00' : 'Change: RM 0.00';
+    return;
+  }
+  const given = parseFloat(rawVal);
+  if (isNaN(given) || given < due) {
+    preview.style.color = '#ef4444';
+    preview.textContent = lang === 'zh' ? `收现不足（需至少 RM ${due.toFixed(2)}）` : `Insufficient (Min RM ${due.toFixed(2)})`;
+    return;
+  }
+  preview.style.color = 'var(--price-color)';
+  preview.textContent = `Change: RM ${(given - due).toFixed(2)}`;
+}
+function confirmExactCash() {
+  if (pendingCashOrderIdx < 0) return;
+  const idx = pendingCashOrderIdx;
+  const due = Number(activeOrders[idx].total || 0);
+  pendingCashOrderIdx = -1;
+  closeModal('cash-modal');
+  settleOrder(idx, 'Cash', due, 0);
+}
+function confirmCustomCash() {
+  if (pendingCashOrderIdx < 0) return;
+  const idx = pendingCashOrderIdx;
+  const due = Number(activeOrders[idx].total || 0);
+  const rawVal = document.getElementById('cash-given-input').value.trim();
+  if (rawVal === '') { confirmExactCash(); return; }
+  const given = parseFloat(rawVal);
+  if (isNaN(given) || given < due) return;
+  pendingCashOrderIdx = -1;
+  closeModal('cash-modal');
+  settleOrder(idx, 'Cash', given, given - due);
+}
+function settleOrder(idx, method, cashReceived = null, cashChange = null) {
+  if (idx < 0 || !activeOrders[idx]) return;
+  const ord = activeOrders[idx];
+  const due = Number(ord.total || 0);
+  const now = new Date();
+  const bizDay = ord.bizDate || selectedBizDate || getDefaultBusinessDateStr(now);
+  const paidObj = {
+    ...ord,
+    payMethod: method,
+    cashReceived: method === 'Cash' ? (cashReceived !== null ? cashReceived : due) : null,
+    cashChange: method === 'Cash' ? (cashChange !== null ? cashChange : 0) : null,
+    paidAt: formatSpaceDate(now),
+    dateStr: bizDay,
+    monthStr: bizDay.slice(0, 7),
+    yearStr: bizDay.slice(0, 4)
+  };
+  completedOrders.unshift(paidObj);
+  activeOrders.splice(idx, 1);
+  localStorage.setItem('rainbow_active_orders', JSON.stringify(activeOrders));
+  localStorage.setItem('rainbow_completed_orders', JSON.stringify(completedOrders));
+  renderPOS(); renderAccounting();
+  showConfirm(lang === 'zh' ? `${displayStoredTable(ord.table)} 已结账（RM ${due.toFixed(2)}），是否打印收据？` : `Paid RM ${due.toFixed(2)}. Print receipt?`, () => {
+    printReceiptData(paidObj, `Paid (${method})`);
+  });
+}
+
+function onBizDayChange() {
+  const val = document.getElementById('biz-day-input').value;
+  if (!val) return;
+  selectedBizDate = val;
+  selectedClosingMonth = val.slice(0, 7);
+  document.getElementById('biz-month-input').value = selectedClosingMonth;
+  localStorage.setItem('rainbow_biz_date', selectedBizDate);
+  localStorage.setItem('rainbow_closing_month', selectedClosingMonth);
+  renderAccounting();
+}
+function onBizMonthChange() {
+  const val = document.getElementById('biz-month-input').value;
+  if (!val) return;
+  selectedClosingMonth = val;
+  localStorage.setItem('rainbow_closing_month', selectedClosingMonth);
+  renderAccounting();
+}
+
+function openEditPaidOrderModal(realIdx, e) {
+  e.stopPropagation();
+  const ord = completedOrders[realIdx];
+  if (!ord) return;
+  editingPaidOrderIdx = realIdx;
+  document.getElementById('edit-paid-date').value = ord.dateStr || selectedBizDate || getDefaultBusinessDateStr();
+  document.getElementById('edit-paid-pay').value = ord.payMethod || 'Cash';
+  document.getElementById('edit-paid-total').value = Number(ord.total || 0).toFixed(2);
+  document.getElementById('edit-paid-modal').classList.add('show');
+}
+function saveEditedPaidOrder() {
+  if (editingPaidOrderIdx < 0 || !completedOrders[editingPaidOrderIdx]) return;
+  const dateStr = document.getElementById('edit-paid-date').value;
+  const payMethod = document.getElementById('edit-paid-pay').value;
+  const total = parseFloat(document.getElementById('edit-paid-total').value);
+  if (!dateStr || isNaN(total) || total < 0) return;
+  completedOrders[editingPaidOrderIdx] = {
+    ...completedOrders[editingPaidOrderIdx],
+    dateStr,
+    monthStr: dateStr.slice(0, 7),
+    yearStr: dateStr.slice(0, 4),
+    payMethod,
+    total
+  };
+  localStorage.setItem('rainbow_completed_orders', JSON.stringify(completedOrders));
+  closeModal('edit-paid-modal');
+  editingPaidOrderIdx = -1;
+  renderAccounting();
+}
+
+function addExpense() {
+  const cat = document.getElementById('exp-cat').value;
+  const amount = parseFloat(document.getElementById('exp-amount').value);
+  const note = document.getElementById('exp-note').value.trim();
+  if (!amount || amount <= 0) return;
+  const bizDay = selectedBizDate || getDefaultBusinessDateStr();
+  expenses.unshift({
+    id: 'EXP-' + Date.now().toString().slice(-5),
+    cat, amount, note,
+    dateTimeStr: formatSpaceDate(bizDay),
+    dateStr: bizDay,
+    monthStr: bizDay.slice(0, 7),
+    yearStr: bizDay.slice(0, 4)
+  });
+  localStorage.setItem('rainbow_expenses', JSON.stringify(expenses));
+  document.getElementById('exp-amount').value = '';
+  document.getElementById('exp-note').value = '';
+  renderAccounting();
+}
+function openEditExpenseModal(realIdx) {
+  const exp = expenses[realIdx];
+  if (!exp) return;
+  editingExpenseIdx = realIdx;
+  document.getElementById('edit-exp-cat').value = exp.cat || EXP_CATS[0].zh;
+  document.getElementById('edit-exp-date').value = exp.dateStr || selectedBizDate || getDefaultBusinessDateStr();
+  document.getElementById('edit-exp-amount').value = String(exp.amount || '');
+  document.getElementById('edit-exp-note').value = exp.note || '';
+  document.getElementById('edit-exp-modal').classList.add('show');
+}
+function saveEditedExpense() {
+  if (editingExpenseIdx < 0 || !expenses[editingExpenseIdx]) return;
+  const cat = document.getElementById('edit-exp-cat').value;
+  const dateStr = document.getElementById('edit-exp-date').value;
+  const amount = parseFloat(document.getElementById('edit-exp-amount').value);
+  const note = document.getElementById('edit-exp-note').value.trim();
+  if (!dateStr || isNaN(amount) || amount <= 0) return;
+  expenses[editingExpenseIdx] = {
+    ...expenses[editingExpenseIdx],
+    cat, dateStr, monthStr: dateStr.slice(0, 7), yearStr: dateStr.slice(0, 4),
+    dateTimeStr: formatSpaceDate(dateStr), amount, note
+  };
+  localStorage.setItem('rainbow_expenses', JSON.stringify(expenses));
+  closeModal('edit-exp-modal'); editingExpenseIdx = -1;
+  renderAccounting();
+}
+function deleteExpense(realIdx) {
+  showConfirm(lang === 'zh' ? '确定删除这笔支出？' : 'Delete expense?', () => {
+    expenses.splice(realIdx, 1);
+    localStorage.setItem('rainbow_expenses', JSON.stringify(expenses));
+    renderAccounting();
+  });
+}
+function toggleHistoryDetail(id) {
+  const el = document.getElementById('hist-detail-' + id);
+  if (el) el.classList.toggle('open');
+}
+function deletePaidOrder(realIdx, e) {
+  e.stopPropagation();
+  showConfirm(lang === 'zh' ? '确定删除这笔已结账记录？' : 'Delete paid record?', () => {
+    completedOrders.splice(realIdx, 1);
+    localStorage.setItem('rainbow_completed_orders', JSON.stringify(completedOrders));
+    renderAccounting();
+  });
+}
+function reopenPaidOrder(realIdx, e) {
+  e.stopPropagation();
+  const ord = completedOrders[realIdx];
+  showConfirm(lang === 'zh' ? `将单据 ${ord.id}（营业日 ${formatDashDate(ord.dateStr)}）载回点餐页修改并重开？` : `Reopen ${ord.id}?`, () => {
+    cart = ord.items.map(i => ({ ...i }));
+    selectedTables = Array.isArray(ord.rawTables) ? [...ord.rawTables] : [];
+    editingOrderBizDate = ord.dateStr || selectedBizDate || getDefaultBusinessDateStr();
+    completedOrders.splice(realIdx, 1);
+    localStorage.setItem('rainbow_completed_orders', JSON.stringify(completedOrders));
+    renderTables(); renderCart(); renderAccounting();
+    switchPage('order', document.getElementById('tab-order'));
+  });
+}
+
+function printReceiptData(ord, statusLabel = '') {
+  document.body.classList.remove('print-a4');
+  const area = document.getElementById('print-area');
+  const due = Number(ord.total || 0);
+  const receiptDateStr = formatSpaceDate(ord.dateStr || ord.paidAt || ord.dateTimeStr || new Date());
+  const earnedStamps = Math.floor(due / 25);
+
+  const rawTbl = String(ord.table || '').trim();
+  let tableEn = '-';
+  if (rawTbl === '打包' || rawTbl.toUpperCase() === 'TAKEAWAY' || rawTbl.includes('Takeaway')) {
+    tableEn = 'Takeaway';
+  } else if (rawTbl) {
+    tableEn = rawTbl
+      .split('+')
+      .map(s => s.replace(/号/g, '').replace(/Table/gi, '').trim())
+      .filter(Boolean)
+      .map(num => `Table ${num}`)
+      .join(' + ');
+  }
+
+  const itemsHtml = (ord.items || []).map(i => {
+    const amt = (i.redeemed ? 0 : Number(i.subTotal || 0)).toFixed(2);
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:4px;">
+        <span style="flex:1;min-width:0;word-break:break-word;text-align:left;">${i.code} ${bilingualItemName(i)} x${i.qty}</span>
+        <span style="flex-shrink:0;white-space:nowrap;text-align:right;font-weight:600;">RM ${amt}</span>
+      </div>
+    `;
+  }).join('');
+
+  area.innerHTML = `
+    <div style="width:54mm;margin:0;padding:0;font-family:-apple-system,'PingFang SC',monospace;font-size:10px;line-height:1.35;color:#000;">
+      <div style="text-align:center;font-weight:800;font-size:11.5px;">Rainbow Ice Parlour & Coffee House</div>
+      <div style="text-align:center;font-size:9px;">Since 1991</div>
+      <div style="border-top:1px dashed #000;margin:4px 0;"></div>
+      <div style="font-size:9px;">Order: ${ord.id} (${statusLabel})</div>
+      <div style="font-size:9px;">Table: ${tableEn}</div>
+      <div style="font-size:9px;">Date: ${receiptDateStr}</div>
+      ${ord.payMethod ? `<div style="font-size:9px;">Pay: ${ord.payMethod}</div>` : ''}
+      <div style="border-top:1px dashed #000;margin:4px 0;"></div>
+      ${itemsHtml}
+      <div style="border-top:1px dashed #000;margin:4px 0;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:800;font-size:11px;">
+        <span style="white-space:nowrap;">TOTAL (NETT):</span>
+        <span style="white-space:nowrap;text-align:right;">RM ${due.toFixed(2)}</span>
+      </div>
+      <div style="border-top:1px dashed #000;margin:5px 0;"></div>
+      <div style="font-size:9px;line-height:1.4;text-align:center;">
+        <div><b>RM 25 = 1 Stamp</b>（集满印花可兑换指定美食 / Collect stamps to redeem food）</div>
+        ${earnedStamps > 0 ? `<div style="font-weight:700;margin-top:2px;">★ 本单可盖 / Earned: ${earnedStamps} Stamp(s) ★</div>` : ''}
+        <div style="margin-top:3px;">外卖 / 预订请电联 Order / Call: <b>016-9326173 / 016-9402647</b></div>
+        <div style="margin-top:2px;font-weight:700;">谢谢惠顾 · Thank You!</div>
+      </div>
+    </div>
+  `;
+  area.style.display = 'block';
+  window.print();
+  setTimeout(() => { area.style.display = 'none'; }, 350);
+}
+
+function buildCompactClosingA4Html(reportTitleEn, periodLabelEn, dayOrders, dayExpenses) {
+  const revTotal = dayOrders.reduce((s, x) => s + Number(x.total || 0), 0);
+  const cashTotal = dayOrders.filter(x => x.payMethod === 'Cash').reduce((s, x) => s + Number(x.total || 0), 0);
+  const qrTotal = dayOrders.filter(x => x.payMethod === 'DuitNow QR').reduce((s, x) => s + Number(x.total || 0), 0);
+  const expTotal = dayExpenses.reduce((s, x) => s + Number(x.amount || 0), 0);
+  const netProfit = revTotal - expTotal;
+  const printedStr = formatPrinted12h(new Date());
+
+  const formatTableEn = (tbl) => {
+    if (!tbl) return '-';
+    if (tbl === '打包' || tbl.includes('Takeaway')) return 'Takeaway';
+    return tbl.split('+').map(s => `Table ${s.trim().replace('号', '').replace('Table', '').trim()}`).join(' + ');
+  };
+
+  const combinedRows = [];
+  dayOrders.forEach(o => {
+    combinedRows.push({
+      type: 'Revenue', code: o.id,
+      desc: `${formatTableEn(o.table)} - ${o.payMethod || '-'}`,
+      date: formatDashDate(o.dateStr || o.paidAt || o.dateTimeStr || new Date()),
+      amountStr: `+RM ${Number(o.total || 0).toFixed(2)}`
+    });
+  });
+  dayExpenses.forEach(e => {
+    combinedRows.push({
+      type: 'Expense', code: e.id,
+      desc: translateExpenseToEnglish(e),
+      date: formatDashDate(e.dateStr || e.dateTimeStr || new Date()),
+      amountStr: `-RM ${Number(e.amount || 0).toFixed(2)}`
+    });
+  });
+
+  const ROWS_PER_PAGE = 26;
+  const chunks = [];
+  if (combinedRows.length === 0) chunks.push([]);
+  else for (let i = 0; i < combinedRows.length; i += ROWS_PER_PAGE) chunks.push(combinedRows.slice(i, i + ROWS_PER_PAGE));
+
+  return chunks.map((chunk, pageIdx) => {
+    const startNo = pageIdx * ROWS_PER_PAGE;
+    const rowsHtml = chunk.length
+      ? chunk.map((r, i) => `
+        <tr>
+          <td>${startNo + i + 1}</td>
+          <td>${r.type}</td>
+          <td>${r.code}</td>
+          <td>${r.desc}</td>
+          <td>${r.date}</td>
+          <td style="text-align:right;font-weight:700;">${r.amountStr}</td>
+        </tr>
+      `).join('')
+      : `<tr><td colspan="6" style="text-align:center;color:#555;padding:6px;">No records</td></tr>`;
+
+    return `
+      <div class="a4-page-block">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1.2pt solid #000;padding-bottom:3px;margin-bottom:6px;">
+          <div style="font-size:10.5pt;font-weight:700;">Rainbow Ice Parlour & Coffee House Since 1991 · ${reportTitleEn}</div>
+          <div style="font-size:8.5pt;font-weight:600;">${periodLabelEn} · Page ${pageIdx + 1}/${chunks.length}</div>
+        </div>
+
+        <table class="a4-summary-table">
+          <tr>
+            <td><b>Revenue:</b> RM ${revTotal.toFixed(2)}</td>
+            <td><b>Cash:</b> RM ${cashTotal.toFixed(2)}</td>
+            <td><b>QR:</b> RM ${qrTotal.toFixed(2)}</td>
+            <td><b>Expense:</b> RM ${expTotal.toFixed(2)}</td>
+            <td><b>Net Profit:</b> <b>RM ${netProfit.toFixed(2)}</b></td>
+          </tr>
+        </table>
+
+        <table class="a4-compact-table">
+          <thead>
+            <tr>
+              <th style="width:28px;">#</th>
+              <th style="width:66px;">Type</th>
+              <th style="width:78px;">Ref No.</th>
+              <th>Details / Item Purchased</th>
+              <th style="width:88px;">Date</th>
+              <th style="width:82px;text-align:right;">Amount</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+
+        <div class="a4-sign-footer">
+          <div class="a4-sign-row">
+            <div class="a4-sign-box">
+              <div><b>Prepared By (Sign & Date):</b></div>
+              <div class="a4-sign-line"></div>
+            </div>
+            <div class="a4-sign-box">
+              <div><b>Verified By (Sign & Date):</b></div>
+              <div class="a4-sign-line"></div>
+            </div>
+            <div class="a4-sign-box">
+              <div><b>Approved By (Sign & Date):</b></div>
+              <div class="a4-sign-line"></div>
+            </div>
+          </div>
+          <div>
+            <div><b>Remarks / Written Declaration (写明说明 / 调整备注):</b></div>
+            <div class="a4-notes-box">
+              <div class="a4-write-line"></div>
+              <div class="a4-write-line"></div>
+              <div class="a4-write-line" style="border-bottom:none;"></div>
+            </div>
+          </div>
+          <div style="margin-top:8px;text-align:right;font-size:8pt;color:#333;">Printed: ${printedStr}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function printDailyClosingA4() {
+  const bizDay = selectedBizDate || getDefaultBusinessDateStr();
+  const dayOrders = completedOrders.filter(x => x.dateStr === bizDay);
+  const dayExpenses = expenses.filter(x => x.dateStr === bizDay);
+  document.body.classList.add('print-a4');
+  const area = document.getElementById('print-area');
+  area.innerHTML = buildCompactClosingA4Html('Daily Closing Report', `Date: ${formatDashDate(bizDay)}`, dayOrders, dayExpenses);
+  area.style.display = 'block';
+  window.print();
+  setTimeout(() => { area.style.display = 'none'; document.body.classList.remove('print-a4'); }, 400);
+}
+
+function printMonthlyClosingA4() {
+  const monthStr = selectedClosingMonth || (selectedBizDate || getDefaultBusinessDateStr()).slice(0, 7);
+  const monthOrders = completedOrders.filter(x => x.monthStr === monthStr || (x.dateStr && x.dateStr.startsWith(monthStr)));
+  const monthExpenses = expenses.filter(x => x.monthStr === monthStr || (x.dateStr && x.dateStr.startsWith(monthStr)));
+  const [yStr, mStr] = monthStr.split('-');
+  const monthLabel = `${MONTHS_SHORT[(parseInt(mStr, 10) || 1) - 1]}-${yStr}`;
+  document.body.classList.add('print-a4');
+  const area = document.getElementById('print-area');
+  area.innerHTML = buildCompactClosingA4Html('Monthly Closing Report', `Month: ${monthLabel}`, monthOrders, monthExpenses);
+  area.style.display = 'block';
+  window.print();
+  setTimeout(() => { area.style.display = 'none'; document.body.classList.remove('print-a4'); }, 400);
+}
+
+function setHistoryScope(scope) {
+  historyScope = scope;
+  ['day', 'month', 'year'].forEach(s => {
+    const btn = document.getElementById('scope-' + s);
+    if (btn) btn.classList.toggle('active', s === scope);
+  });
+  renderAccounting();
+}
+function formatExpCat(catZh) {
+  const found = EXP_CATS.find(c => c.zh === catZh);
+  return found ? (lang === 'zh' ? found.zh : found.en) : catZh;
+}
+
+function addPlatformOrder() {
+  const platform = document.getElementById('platform-order-type').value || 'Foodpanda';
+  const refNote = (document.getElementById('platform-order-ref').value || '').trim();
+  const amount = parseFloat(document.getElementById('platform-order-amt').value);
+  if (isNaN(amount) || amount <= 0) {
+    showAlert(lang === 'zh' ? '请输入有效的 Foodpanda / Grabfood 订单金额！' : 'Please enter a valid amount.');
+    return;
+  }
+  const bizDay = selectedBizDate || getDefaultBusinessDateStr();
+  const now = new Date();
+  const prefix = platform === 'Grabfood' ? 'GF-' : 'FP-';
+  const orderId = refNote ? `${prefix}${refNote}` : `${prefix}${Date.now().toString().slice(-5)}`;
+  const itemLabel = refNote ? `${platform} (${refNote})` : `${platform} Manual Order`;
+
+  completedOrders.unshift({
+    id: orderId,
+    table: platform,
+    rawTables: [],
+    createdAt: now.getTime(),
+    dateTimeStr: formatSpaceDate(bizDay),
+    paidAt: formatSpaceDate(now),
+    dateStr: bizDay,
+    monthStr: bizDay.slice(0, 7),
+    yearStr: bizDay.slice(0, 4),
+    payMethod: platform,
+    items: [{
+      code: platform === 'Grabfood' ? 'GRAB' : 'PANDA',
+      cat: '外送平台',
+      cn: itemLabel,
+      en: itemLabel,
+      basePrice: amount,
+      qty: 1,
+      spec: '',
+      redeemed: false,
+      subTotal: amount
+    }],
+    total: amount
+  });
+
+  localStorage.setItem('rainbow_completed_orders', JSON.stringify(completedOrders));
+  document.getElementById('platform-order-ref').value = '';
+  document.getElementById('platform-order-amt').value = '';
+  renderAccounting();
+  showAlert(lang === 'zh' ? `已记录 ${platform} RM ${amount.toFixed(2)}（营业日 ${formatDashDate(bizDay)}）！` : `Recorded ${platform} RM ${amount.toFixed(2)}.`);
+}
+
+function renderAccounting() {
+  const bizDay = selectedBizDate || getDefaultBusinessDateStr();
+  const month = selectedClosingMonth || bizDay.slice(0, 7);
+  const year = month.slice(0, 4);
+  const yearStart = `${year}-01-01`;
+
+  const inScope = (recDateStr, scope) => {
+    if (!recDateStr) return false;
+    if (scope === 'day') return recDateStr === bizDay;
+    if (scope === 'month') return recDateStr.startsWith(month);
+    if (scope === 'year') return recDateStr.startsWith(year + '-');
+    return true;
+  };
+
+  const sumOrders = (scope) => completedOrders.filter(x => inScope(x.dateStr, scope)).reduce((s, x) => s + Number(x.total || 0), 0);
+  const sumExp = (scope) => expenses.filter(x => inScope(x.dateStr, scope)).reduce((s, x) => s + Number(x.amount || 0), 0);
+
+  const todayRev = sumOrders('day');
+  const todayCash = completedOrders.filter(x => x.dateStr === bizDay && x.payMethod === 'Cash').reduce((s, x) => s + Number(x.total || 0), 0);
+  const todayQR = completedOrders.filter(x => x.dateStr === bizDay && x.payMethod === 'DuitNow QR').reduce((s, x) => s + Number(x.total || 0), 0);
+  const todayExp = sumExp('day');
+  const monthRev = sumOrders('month');
+  const monthExp = sumExp('month');
+  const yearRev = sumOrders('year');
+  const yearExp = sumExp('year');
+
+  document.getElementById('stats-grid').innerHTML = `
+    <div class="stat-card ${historyScope === 'day' ? 'active-period' : ''}" onclick="triggerHaptic(); setHistoryScope('day');">
+      <div class="stat-title">${lang === 'zh' ? '营业日收入' : 'Biz Day Revenue'} (${formatDashDate(bizDay)})</div>
+      <div class="stat-val" style="color:var(--price-color);">RM ${todayRev.toFixed(2)}</div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:4px;">Cash: RM ${todayCash.toFixed(2)} | QR: RM ${todayQR.toFixed(2)}</div>
+    </div>
+    <div class="stat-card ${historyScope === 'day' ? 'active-period' : ''}" onclick="triggerHaptic(); setHistoryScope('day');">
+      <div class="stat-title">${lang === 'zh' ? '营业日支出 / 净赚' : 'Biz Day Expense & Net'}</div>
+      <div class="stat-val" style="color:#ef4444;">- RM ${todayExp.toFixed(2)}</div>
+      <div style="font-size:0.84rem;font-weight:700;color:var(--primary);margin-top:4px;">${lang === 'zh' ? '净赚' : 'Net'}: RM ${(todayRev - todayExp).toFixed(2)}</div>
+    </div>
+    <div class="stat-card ${historyScope === 'month' ? 'active-period' : ''}" onclick="triggerHaptic(); setHistoryScope('month');">
+      <div class="stat-title">${lang === 'zh' ? '所选月收入 / 净赚' : 'Month Revenue & Net'} (${month})</div>
+      <div class="stat-val">RM ${monthRev.toFixed(2)}</div>
+      <div style="font-size:0.84rem;font-weight:700;color:var(--price-color);margin-top:4px;">${lang === 'zh' ? '净赚' : 'Net'}: RM ${(monthRev - monthExp).toFixed(2)}</div>
+    </div>
+    <div class="stat-card ${historyScope === 'year' ? 'active-period' : ''}" onclick="triggerHaptic(); setHistoryScope('year');">
+      <div class="stat-title">${lang === 'zh' ? '年度收入 / 净赚' : 'Year Revenue & Net'} (${year})</div>
+      <div class="stat-val">RM ${yearRev.toFixed(2)}</div>
+      <div style="font-size:0.84rem;font-weight:700;color:var(--price-color);margin-top:4px;">${lang === 'zh' ? '净赚' : 'Net'}: RM ${(yearRev - yearExp).toFixed(2)}</div>
+    </div>
+  `;
+
+  const scopeTitleMap = {
+    day: `${t('scopeLabelDay')} (${formatDashDate(bizDay)})`,
+    month: `${t('scopeLabelMonth')} (${month})`,
+    year: `${t('scopeLabelYear')} (${yearStart} - ${year}-12-31)`
+  };
+  document.getElementById('history-scope-label').textContent = scopeTitleMap[historyScope];
+
+  const filteredOrders = completedOrders.map((ord, realIdx) => ({ ord, realIdx })).filter(({ ord }) => inScope(ord.dateStr, historyScope));
+  const histEl = document.getElementById('paid-history-list');
+  if (filteredOrders.length === 0) {
+    histEl.innerHTML = `<div style="background:var(--notif-card);padding:12px;border-radius:14px;border:1px solid var(--glass-border);color:var(--muted);">${t('noPaidHist')}</div>`;
+  } else {
+    histEl.innerHTML = filteredOrders.map(({ ord, realIdx }) => `
+      <div class="history-card">
+        <div class="history-header" onclick="triggerHaptic(); toggleHistoryDetail(${realIdx});">
+          <div>
+            <b>${displayStoredTable(ord.table)}</b> · <span style="color:var(--muted);font-size:0.82rem;font-family:monospace;">${ord.id}</span>
+            <span style="margin-left:8px;font-size:0.78rem;background:var(--tbl-btn-hover);color:var(--text);padding:2px 7px;border-radius:6px;font-weight:600;">${ord.payMethod}</span>
+            <div style="font-size:0.78rem;color:var(--muted);margin-top:2px;">${lang === 'zh' ? '营业日' : 'Biz Day'}: ${formatDashDate(ord.dateStr || ord.paidAt)}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span style="font-weight:700;color:var(--price-color);font-size:1rem;margin-right:4px;">RM ${Number(ord.total || 0).toFixed(2)}</span>
+            <button class="mini-btn" onclick="openEditPaidOrderModal(${realIdx}, event)">${t('editPaidBtn')}</button>
+            <button class="mini-btn" onclick="reopenPaidOrder(${realIdx}, event)">✏️ ${lang === 'zh' ? '改单重开' : 'Reopen'}</button>
+            <button class="mini-btn" onclick="event.stopPropagation();triggerHaptic();printReceiptData(completedOrders[${realIdx}], 'Reprint')">${t('printBtn')}</button>
+            <button class="mini-btn del" onclick="deletePaidOrder(${realIdx}, event)">${t('delBtn')}</button>
+          </div>
+        </div>
+        <div class="history-detail" id="hist-detail-${realIdx}">
+          ${ord.items.map(i => `
+            <div style="display:flex;justify-content:space-between;padding:3px 0;">
+              <span>${i.code} ${itemTitle(i)} ×${i.qty}</span>
+              <span>RM ${(i.redeemed ? 0 : Number(i.subTotal || 0)).toFixed(2)}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  const filteredExpenses = expenses.map((exp, realIdx) => ({ exp, realIdx })).filter(({ exp }) => inScope(exp.dateStr, historyScope));
+  const expList = document.getElementById('expense-list');
+  if (filteredExpenses.length === 0) {
+    expList.innerHTML = `<div style="background:var(--notif-card);padding:12px;border-radius:14px;border:1px solid var(--glass-border);color:var(--muted);">${t('noExpHist')}</div>`;
+  } else {
+    expList.innerHTML = filteredExpenses.map(({ exp, realIdx }) => `
+      <div class="history-card" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+        <div>
+          <b>[${formatExpCat(exp.cat)}]</b> ${exp.note || (lang === 'zh' ? '无备注' : 'No note')}
+          <small style="color:var(--muted);margin-left:6px;font-family:monospace;">${formatDashDate(exp.dateStr || exp.dateTimeStr)}</small>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <span style="font-weight:700;color:#ef4444;margin-right:2px;">- RM ${Number(exp.amount || 0).toFixed(2)}</span>
+          <button class="mini-btn" onclick="triggerHaptic(); openEditExpenseModal(${realIdx});">${t('editExpBtn')}</button>
+          <button class="mini-btn del" onclick="triggerHaptic(); deleteExpense(${realIdx});">${t('delBtn')}</button>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+(function setupMidnightAutoRefresh() {
+  const getTodayYmd = () => {
+    const d = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  };
+  let lastCalendarDay = getTodayYmd();
+
+  setInterval(() => {
+    const nowDay = getTodayYmd();
+    if (nowDay !== lastCalendarDay) {
+      lastCalendarDay = nowDay;
+      selectedBizDate = nowDay;
+      selectedClosingMonth = nowDay.slice(0, 7);
+      localStorage.setItem('rainbow_biz_date', selectedBizDate);
+      localStorage.setItem('rainbow_closing_month', selectedClosingMonth);
+      const dayInput = document.getElementById('biz-day-input');
+      const monthInput = document.getElementById('biz-month-input');
+      if (dayInput) dayInput.value = selectedBizDate;
+      if (monthInput) monthInput.value = selectedClosingMonth;
+      if (typeof renderAccounting === 'function') renderAccounting();
+      if (typeof renderPOS === 'function') renderPOS();
+    }
+  }, 15000);
+})();
+
+(function setupMobileStickyOrderBar() {
+  function ensureBar() {
+    let bar = document.getElementById('mobile-sticky-order-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'mobile-sticky-order-bar';
+      bar.innerHTML = `
+        <div class="m-sticky-info">
+          <span class="m-sticky-sub" id="m-sticky-sub"></span>
+          <span class="m-sticky-total" id="m-sticky-total">RM 0.00</span>
+        </div>
+        <button type="button" class="m-sticky-btn" id="m-sticky-send-btn"></button>
+      `;
+      document.body.appendChild(bar);
+
+      const btn = document.getElementById('m-sticky-send-btn');
+      if (btn) {
+        btn.onclick = () => {
+          if (typeof triggerHaptic === 'function') triggerHaptic();
+          if (typeof submitOrder === 'function') submitOrder();
+        };
+      }
+    }
+    return bar;
+  }
+
+  function syncBar() {
+    const bar = ensureBar();
+    const orderPage = document.getElementById('page-order');
+    const isOrderActive = orderPage && orderPage.classList.contains('active');
+    if (!isOrderActive) {
+      bar.style.display = 'none';
+      return;
+    }
+    bar.style.display = '';
+
+    const isZh = typeof lang !== 'undefined' && lang === 'zh';
+    const qtyCount = Array.isArray(cart)
+      ? cart.reduce((sum, item) => sum + Number(item.qty || 1), 0)
+      : 0;
+    const totalVal = Array.isArray(cart)
+      ? cart.reduce((sum, item) => sum + (typeof getCartItemRowTotal === 'function' ? Number(getCartItemRowTotal(item) || 0) : 0), 0)
+      : 0;
+
+    const tblText = (typeof selectedTables !== 'undefined' && Array.isArray(selectedTables) && selectedTables.length)
+      ? selectedTables.join(' + ')
+      : (isZh ? '未选桌号' : 'No Table');
+
+    const subEl = document.getElementById('m-sticky-sub');
+    const totEl = document.getElementById('m-sticky-total');
+    const btnEl = document.getElementById('m-sticky-send-btn');
+
+    if (subEl) {
+      subEl.textContent = isZh
+        ? `${tblText} · 已选 ${qtyCount} 项`
+        : `${tblText} · ${qtyCount} item(s)`;
+    }
+    if (totEl) {
+      totEl.textContent = `${isZh ? '合计' : 'Total'}: RM ${totalVal.toFixed(2)}`;
+    }
+    if (btnEl) {
+      const isEditing = typeof editingActiveOrderIdx !== 'undefined' && editingActiveOrderIdx >= 0;
+      btnEl.textContent = isEditing
+        ? (isZh ? '✓ 保存修改' : '✓ Update Order')
+        : (isZh ? '✓ 送出订单' : '✓ Send Order');
+    }
+  }
+
+  const origRenderCart = window.renderCart;
+  if (typeof origRenderCart === 'function') {
+    window.renderCart = function (...args) {
+      const res = origRenderCart.apply(this, args);
+      syncBar();
+      return res;
+    };
+  }
+
+  const origSwitchPage = window.switchPage;
+  if (typeof origSwitchPage === 'function') {
+    window.switchPage = function (...args) {
+      const res = origSwitchPage.apply(this, args);
+      syncBar();
+      return res;
+    };
+  }
+
+  const origToggleTable = window.toggleTable;
+  if (typeof origToggleTable === 'function') {
+    window.toggleTable = function (...args) {
+      const res = origToggleTable.apply(this, args);
+      syncBar();
+      return res;
+    };
+  }
+  const origSetLanguage = window.setLanguage;
+  if (typeof origSetLanguage === 'function') {
+    window.setLanguage = function (...args) {
+      const res = origSetLanguage.apply(this, args);
+      syncBar();
+      return res;
+    };
+  }
+  window.addEventListener('resize', syncBar, { passive: true });
+  requestAnimationFrame(syncBar);
+})();
+init();
+</script>
+</body>
+</html>
