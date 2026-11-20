@@ -689,6 +689,19 @@ body.dark-mode .modal-box {
     display: none !important;
   }
 }
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+button, .menu-card, .tbl-btn, .cat-btn, .mini-btn, .pay-btn {
+  touch-action: manipulation;
+  will-change: transform;
+}
+.menu-card:active, .tbl-btn:active, .cat-btn:active {
+  transform: scale(0.96) translateZ(0);
+}
+.modal-box {
+  will-change: transform, opacity;
+}
   </style>
 </head>
 <body>
@@ -2485,16 +2498,32 @@ function getRemarkTagObjectsForCartItem(item) {
     sauceSeparate: { zh: '分开酱汁', en: 'Sauce Separate' }
   };
 
-  let keys = [];
   if (!isDrinkCartItem(item)) {
-    // 1. 普通食物（非饮料分类）：不需要少冰、去冰、少甜、走甜
-    keys = ['takeaway', 'redeem', 'noSpicy', 'extraSpicy', 'sauceSeparate'];
-  } else if (hasPaidDrinkSpec(item)) {
+    // 1. 普通食物：不需要少冰、去冰、少甜、走甜
+    return ['takeaway', 'redeem', 'noSpicy', 'extraSpicy', 'sauceSeparate']
+      .map(k => catalog[k]).filter(Boolean);
+  }
+
+  const specStr = String(item?.spec || '').trim();
+  const isSelectedNoIce = /去冰|no\s*ice/i.test(specStr);
+  const isSelectedIceOnly = !isSelectedNoIce && /(^|[,，\s])(冰|ice)([,，\s]|$)/i.test(specStr);
+
+  let keys;
+  if (hasPaidDrinkSpec(item)) {
     // 3. 饮料分类 — 已有收费规格选项
     keys = ['redeem', 'takeaway', 'lessIce', 'noIce', 'lessSweet', 'noSweet'];
   } else {
     // 2. 固定价格的饮料分类
     keys = ['redeem', 'takeaway', 'lessSweet', 'noSweet', 'lessIce', 'noIce'];
+  }
+
+  // 防矛盾过滤：
+  // - 已经选了“去冰”规格 -> 不再显示“去冰”和“少冰”
+  // - 已经选了“冰”规格 -> 不再显示“去冰”
+  if (isSelectedNoIce) {
+    keys = keys.filter(k => k !== 'noIce' && k !== 'lessIce');
+  } else if (isSelectedIceOnly) {
+    keys = keys.filter(k => k !== 'noIce');
   }
 
   return keys.map(k => catalog[k]).filter(Boolean);
@@ -2581,6 +2610,14 @@ function submitOrder() {
     return { ...item, subTotal: sub };
   });
   const now = new Date();
+
+  const goToPosPage = () => {
+    const posBtn = document.getElementById('tab-pos');
+    if (typeof switchPage === 'function') {
+      switchPage('pos', posBtn);
+    }
+  };
+
   if (editingActiveOrderIdx >= 0 && activeOrders[editingActiveOrderIdx]) {
     const oldOrd = activeOrders[editingActiveOrderIdx];
     activeOrders[editingActiveOrderIdx] = {
@@ -2593,11 +2630,15 @@ function submitOrder() {
     };
     editingActiveOrderIdx = -1;
     localStorage.setItem('rainbow_active_orders', JSON.stringify(activeOrders));
-    cart = []; selectedTables = [];
-    renderTables(); renderCart(); renderPOS();
-    showAlert(lang === 'zh' ? '桌单已更新！' : 'Order updated!');
+    cart = [];
+    selectedTables = [];
+    renderTables();
+    renderCart();
+    renderPOS();
+    goToPosPage();
     return;
   }
+
   const targetBizDate = editingOrderBizDate || selectedBizDate || getDefaultBusinessDateStr(now);
   activeOrders.unshift({
     id: 'ORD-' + Date.now().toString().slice(-5),
@@ -2611,9 +2652,12 @@ function submitOrder() {
   });
   editingOrderBizDate = null;
   localStorage.setItem('rainbow_active_orders', JSON.stringify(activeOrders));
-  cart = []; selectedTables = [];
-  renderTables(); renderCart(); renderPOS();
-  showAlert(lang === 'zh' ? `订单已送出（归属营业日 ${formatDashDate(targetBizDate)}）！` : `Order sent (Biz Date ${formatDashDate(targetBizDate)}).`);
+  cart = [];
+  selectedTables = [];
+  renderTables();
+  renderCart();
+  renderPOS();
+  goToPosPage();
 }
 
 function editActiveOrderInCart(idx) {
@@ -2908,22 +2952,50 @@ function printReceiptData(ord, statusLabel = '') {
       .join(' + ');
   }
 
+  const hasCashBreakdown =
+    ord.payMethod === 'Cash' &&
+    ord.cashReceived !== undefined &&
+    ord.cashReceived !== null &&
+    !isNaN(Number(ord.cashReceived));
+  const cashRecVal = hasCashBreakdown ? Number(ord.cashReceived) : 0;
+  const cashChgVal = hasCashBreakdown
+    ? (ord.cashChange !== undefined && ord.cashChange !== null && !isNaN(Number(ord.cashChange))
+        ? Number(ord.cashChange)
+        : Math.max(0, cashRecVal - due))
+    : 0;
+
   const itemsHtml = (ord.items || []).map(i => {
     const amt = (i.redeemed ? 0 : Number(i.subTotal || 0)).toFixed(2);
+    const noteParts = (typeof formatRedeemAndRemark === 'function') ? formatRedeemAndRemark(i) : [];
+    const subLine = [i.spec, ...noteParts].filter(Boolean).join(' · ');
     return `
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:4px;">
-        <span style="flex:1;min-width:0;word-break:break-word;text-align:left;">${i.code} ${bilingualItemName(i)} x${i.qty}</span>
-        <span style="flex-shrink:0;white-space:nowrap;text-align:right;font-weight:600;">RM ${amt}</span>
+      <div style="margin-bottom:5px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">
+          <span style="flex:1;min-width:0;word-break:break-word;text-align:left;">${i.code} ${bilingualItemName(i)} x${i.qty}</span>
+          <span style="flex-shrink:0;white-space:nowrap;text-align:right;font-weight:600;">RM ${amt}</span>
+        </div>
+        ${subLine ? `<div style="font-size:8.5px;color:#222;padding-left:4px;margin-top:1px;">[${subLine}]</div>` : ''}
       </div>
     `;
   }).join('');
+
+  const cashBreakdownHtml = hasCashBreakdown ? `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:9.5px;margin-top:3px;">
+      <span>Cash Received:</span>
+      <span style="font-weight:600;">RM ${cashRecVal.toFixed(2)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:10px;font-weight:700;margin-top:2px;">
+      <span>Change:</span>
+      <span>RM ${cashChgVal.toFixed(2)}</span>
+    </div>
+  ` : '';
 
   area.innerHTML = `
     <div style="width:54mm;margin:0;padding:0;font-family:-apple-system,'PingFang SC',monospace;font-size:10px;line-height:1.35;color:#000;">
       <div style="text-align:center;font-weight:800;font-size:11.5px;">Rainbow Ice Parlour & Coffee House</div>
       <div style="text-align:center;font-size:9px;">Since 1991</div>
       <div style="border-top:1px dashed #000;margin:4px 0;"></div>
-      <div style="font-size:9px;">Order: ${ord.id} (${statusLabel})</div>
+      <div style="font-size:9px;">Order: ${ord.id}${statusLabel ? ` (${statusLabel})` : ''}</div>
       <div style="font-size:9px;">Table: ${tableEn}</div>
       <div style="font-size:9px;">Date: ${receiptDateStr}</div>
       ${ord.payMethod ? `<div style="font-size:9px;">Pay: ${ord.payMethod}</div>` : ''}
@@ -2934,6 +3006,7 @@ function printReceiptData(ord, statusLabel = '') {
         <span style="white-space:nowrap;">TOTAL (NETT):</span>
         <span style="white-space:nowrap;text-align:right;">RM ${due.toFixed(2)}</span>
       </div>
+      ${cashBreakdownHtml}
       <div style="border-top:1px dashed #000;margin:5px 0;"></div>
       <div style="font-size:9px;line-height:1.4;text-align:center;">
         <div><b>RM 25 = 1 Stamp</b>（集满印花可兑换指定美食 / Collect stamps to redeem food）</div>
@@ -3281,6 +3354,129 @@ function renderAccounting() {
     }
   }, 15000);
 })();
+(function enableQuickTablePickerOnSubmit() {
+  const originalSubmitOrder = window.submitOrder;
+  if (typeof originalSubmitOrder !== 'function') return;
+
+  let pickerSelectedTables = [];
+
+  function ensureTablePickerModal() {
+    let mask = document.getElementById('quick-table-picker-modal');
+    if (mask) return mask;
+
+    mask = document.createElement('div');
+    mask.id = 'quick-table-picker-modal';
+    mask.className = 'modal-mask';
+    mask.innerHTML = `
+      <div class="modal-box" style="max-width:440px;">
+        <div class="modal-title" id="qtp-title"></div>
+        <div class="modal-msg" id="qtp-subtitle" style="margin-bottom:10px;"></div>
+        <div id="qtp-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;"></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button type="button" class="mini-btn" style="padding:8px 14px;" id="qtp-cancel-btn"></button>
+          <button type="button" class="mini-btn" style="background:var(--primary);color:#f8fafc;padding:8px 16px;" id="qtp-confirm-btn"></button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(mask);
+
+    document.getElementById('qtp-cancel-btn').onclick = () => {
+      pickerSelectedTables = [];
+      closeModal('quick-table-picker-modal');
+    };
+
+    document.getElementById('qtp-confirm-btn').onclick = () => {
+      if (!Array.isArray(pickerSelectedTables) || pickerSelectedTables.length === 0) return;
+
+      selectedTables = [...pickerSelectedTables];
+      const isTakeaway = typeof isTakeawayMode === 'function' ? isTakeawayMode() : selectedTables.includes('TAKEAWAY');
+      if (Array.isArray(cart)) {
+        cart.forEach(item => {
+          if (item && item.mustPackFee) {
+            item.packFee = isTakeaway ? 0.5 : 0;
+          }
+        });
+      }
+      if (typeof renderTables === 'function') renderTables();
+      if (typeof renderCart === 'function') renderCart();
+
+      closeModal('quick-table-picker-modal');
+      pickerSelectedTables = [];
+      originalSubmitOrder.call(window);
+    };
+
+    return mask;
+  }
+
+  function formatPickerBtnLabel(code) {
+    if (code === 'TAKEAWAY') {
+      return (typeof lang !== 'undefined' && lang === 'en') ? 'Takeaway' : '打包';
+    }
+    if (typeof formatTableLabel === 'function') {
+      return formatTableLabel(code);
+    }
+    return (typeof lang !== 'undefined' && lang === 'en') ? `Table ${code}` : `${code}号`;
+  }
+
+  function renderPickerButtons() {
+    const grid = document.getElementById('qtp-grid');
+    if (!grid || typeof TABLES === 'undefined') return;
+
+    grid.innerHTML = TABLES.map(code => {
+      const isTakeaway = code === 'TAKEAWAY';
+      const isSel = pickerSelectedTables.includes(code);
+      const activeBg = isTakeaway
+        ? 'background:linear-gradient(145deg,#eab308,var(--accent));color:#fffbeb;border-color:transparent;'
+        : 'background:linear-gradient(145deg,#3b82f6,var(--primary-deep));color:#f8fafc;border-color:transparent;';
+      const styleAttr = isSel ? activeBg : '';
+      return `<button type="button" class="tbl-btn ${isTakeaway ? 'takeaway' : ''} ${isSel ? 'selected' : ''}" style="${styleAttr}" onclick="if(typeof triggerHaptic==='function')triggerHaptic(); window.__qtpToggle('${code}');">${formatPickerBtnLabel(code)}</button>`;
+    }).join('');
+  }
+
+  window.__qtpToggle = function (code) {
+    if (code === 'TAKEAWAY') {
+      pickerSelectedTables = pickerSelectedTables.includes(code) ? [] : [code];
+    } else {
+      pickerSelectedTables = pickerSelectedTables.filter(x => x !== 'TAKEAWAY');
+      if (pickerSelectedTables.includes(code)) {
+        pickerSelectedTables = pickerSelectedTables.filter(x => x !== code);
+      } else {
+        pickerSelectedTables.push(code);
+      }
+    }
+    renderPickerButtons();
+  };
+
+  function openQuickTablePicker() {
+    const mask = ensureTablePickerModal();
+    const isZh = typeof lang === 'undefined' || lang === 'zh';
+
+    document.getElementById('qtp-title').textContent = isZh ? '🍽️ 尚未选择桌号，请直接选择' : '🍽️ Select Table to Send Order';
+    document.getElementById('qtp-subtitle').textContent = isZh
+      ? '选好桌号（或打包）后点“确定送出”，将直接送单并跳至第 2 页收银台。'
+      : 'Pick table(s) or Takeaway, then tap Confirm to send and jump to POS.';
+    document.getElementById('qtp-cancel-btn').textContent = typeof t === 'function' ? t('cancelBtn') : (isZh ? '取消' : 'Cancel');
+    document.getElementById('qtp-confirm-btn').textContent = isZh ? '✅ 确定送出' : '✅ Confirm & Send';
+
+    pickerSelectedTables = Array.isArray(selectedTables) ? [...selectedTables] : [];
+    renderPickerButtons();
+    mask.classList.add('show');
+  }
+
+  window.submitOrder = function (...args) {
+    const noCart = !Array.isArray(cart) || cart.length === 0;
+    const noTable = !Array.isArray(selectedTables) || selectedTables.length === 0;
+
+    if (noCart) {
+      return originalSubmitOrder.apply(this, args);
+    }
+    if (noTable) {
+      openQuickTablePicker();
+      return;
+    }
+    return originalSubmitOrder.apply(this, args);
+  };
+})();
 
 (function setupMobileStickyOrderBar() {
   function ensureBar() {
@@ -3386,6 +3582,156 @@ function renderAccounting() {
   }
   window.addEventListener('resize', syncBar, { passive: true });
   requestAnimationFrame(syncBar);
+})();
+
+(function enhanceMobileOrderDrawer() {
+  function formatMobileTableLabel() {
+    const isZh = typeof lang === 'undefined' || lang === 'zh';
+    if (!Array.isArray(selectedTables) || selectedTables.length === 0) {
+      return isZh ? '未选桌号' : 'No Table';
+    }
+    if (selectedTables.includes('TAKEAWAY')) {
+      return isZh ? '打包' : 'Takeaway';
+    }
+    return selectedTables
+      .map(tbl => {
+        const clean = String(tbl).replace(/号/g, '').replace(/Table/gi, '').trim();
+        return isZh ? `桌号${clean}` : `Table ${clean}`;
+      })
+      .join(' + ');
+  }
+
+  function ensureDrawer() {
+    let drawer = document.getElementById('m-cart-drawer');
+    if (drawer) return drawer;
+
+    drawer = document.createElement('div');
+    drawer.id = 'm-cart-drawer';
+    drawer.style.cssText = `
+      position: fixed; left: 0; right: 0; bottom: 68px; z-index: 94;
+      max-height: 62vh; display: none; flex-direction: column;
+      background: var(--modal-bg); border-top: 1px solid var(--glass-border);
+      border-radius: 20px 20px 0 0; box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.18);
+      padding: 12px 14px 16px; overflow-y: auto;
+      transform: translate3d(0, 24px, 0); opacity: 0;
+      transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+    `;
+    drawer.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--glass-line);">
+        <span id="m-drawer-title" style="font-weight:700;font-size:0.95rem;"></span>
+        <button type="button" id="m-drawer-close" class="mini-btn" style="padding:4px 10px;">✕</button>
+      </div>
+      <div id="m-drawer-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+    `;
+    document.body.appendChild(drawer);
+
+    document.getElementById('m-drawer-close').onclick = () => {
+      drawer.style.transform = 'translate3d(0, 24px, 0)';
+      drawer.style.opacity = '0';
+      setTimeout(() => { drawer.style.display = 'none'; }, 200);
+    };
+    return drawer;
+  }
+
+  function renderDrawerItems() {
+    const drawer = ensureDrawer();
+    const listEl = document.getElementById('m-drawer-list');
+    const titleEl = document.getElementById('m-drawer-title');
+    if (!listEl || !titleEl) return;
+
+    const isZh = typeof lang === 'undefined' || lang === 'zh';
+    titleEl.textContent = `${formatMobileTableLabel()} · ${isZh ? '已点明细' : 'Order Items'}`;
+
+    if (!Array.isArray(cart) || cart.length === 0) {
+      listEl.innerHTML = `<div style="text-align:center;color:var(--muted);padding:14px 0;">${isZh ? '还没有选择任何菜品' : 'No items selected yet'}</div>`;
+      return;
+    }
+
+    listEl.innerHTML = cart.map((item, idx) => {
+      const rowTotal = (typeof getCartItemRowTotal === 'function')
+        ? Number(getCartItemRowTotal(item) || 0)
+        : Number(item.basePrice || 0) * Number(item.qty || 1);
+      const notes = (typeof formatRedeemAndRemark === 'function') ? formatRedeemAndRemark(item) : [];
+      const metaLine = [item.spec, ...notes].filter(Boolean).join(' · ');
+
+      return `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;background:var(--notif-card);border:1px solid var(--glass-border);">
+          <div style="min-width:0;flex:1;">
+            <div style="font-weight:700;font-size:0.9rem;">${item.code} ${typeof itemTitle === 'function' ? itemTitle(item) : item.cn} ×${item.qty}</div>
+            ${metaLine ? `<div style="font-size:0.76rem;color:var(--accent);margin-top:2px;">${metaLine}</div>` : ''}
+            <div style="font-size:0.82rem;font-weight:700;color:var(--price-color);margin-top:2px;">RM ${rowTotal.toFixed(2)}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <button type="button" class="mini-btn" onclick="if(typeof triggerHaptic==='function')triggerHaptic(); openRemarkModal(${idx});">${isZh ? '备注' : 'Note'}</button>
+            <button type="button" class="mini-btn del" style="margin-left:0;" onclick="if(typeof triggerHaptic==='function')triggerHaptic(); removeCartItem(${idx});">${isZh ? '删除' : 'Del'}</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function toggleDrawer() {
+    const drawer = ensureDrawer();
+    const isOpen = drawer.style.display === 'flex';
+    if (isOpen) {
+      drawer.style.transform = 'translate3d(0, 24px, 0)';
+      drawer.style.opacity = '0';
+      setTimeout(() => { drawer.style.display = 'none'; }, 200);
+    } else {
+      renderDrawerItems();
+      drawer.style.display = 'flex';
+      requestAnimationFrame(() => {
+        drawer.style.transform = 'translate3d(0, 0, 0)';
+        drawer.style.opacity = '1';
+      });
+    }
+  }
+
+  function patchStickyBar() {
+    const subEl = document.getElementById('m-sticky-sub');
+    const infoEl = subEl ? subEl.parentElement : null;
+    if (infoEl && !infoEl.dataset.drawerBound) {
+      infoEl.dataset.drawerBound = '1';
+      infoEl.style.cursor = 'pointer';
+      infoEl.addEventListener('click', () => {
+        if (typeof triggerHaptic === 'function') triggerHaptic();
+        toggleDrawer();
+      });
+    }
+    if (subEl) {
+      const isZh = typeof lang === 'undefined' || lang === 'zh';
+      const qtyCount = Array.isArray(cart) ? cart.reduce((s, i) => s + Number(i.qty || 1), 0) : 0;
+      subEl.textContent = isZh
+        ? `${formatMobileTableLabel()} · 已选 ${qtyCount} 项 ▴`
+        : `${formatMobileTableLabel()} · ${qtyCount} item(s) ▴`;
+    }
+    const drawer = document.getElementById('m-cart-drawer');
+    if (drawer && drawer.style.display === 'flex') {
+      renderDrawerItems();
+    }
+  }
+
+  const origRenderCart = window.renderCart;
+  if (typeof origRenderCart === 'function') {
+    window.renderCart = function (...args) {
+      const res = origRenderCart.apply(this, args);
+      patchStickyBar();
+      return res;
+    };
+  }
+
+  const origSwitchPage = window.switchPage;
+  if (typeof origSwitchPage === 'function') {
+    window.switchPage = function (...args) {
+      const res = origSwitchPage.apply(this, args);
+      const drawer = document.getElementById('m-cart-drawer');
+      if (drawer) drawer.style.display = 'none';
+      patchStickyBar();
+      return res;
+    };
+  }
+
+  requestAnimationFrame(patchStickyBar);
 })();
 init();
 </script>
