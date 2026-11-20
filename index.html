@@ -702,6 +702,27 @@ button, .menu-card, .tbl-btn, .cat-btn, .mini-btn, .pay-btn {
 .modal-box {
   will-change: transform, opacity;
 }
+/* 弹窗取消按钮统一醒目红框样式 */
+.modal-box button[id$="-cancel-btn"],
+.modal-box #ui-cancel-btn {
+  background: rgba(239, 68, 68, 0.14) !important;
+  color: #dc2626 !important;
+  border: 1.5px solid #ef4444 !important;
+  font-weight: 700 !important;
+  border-radius: 10px !important;
+}
+
+body.dark-mode .modal-box button[id$="-cancel-btn"],
+body.dark-mode .modal-box #ui-cancel-btn {
+  background: rgba(239, 68, 68, 0.22) !important;
+  color: #fca5a5 !important;
+  border-color: #f87171 !important;
+}
+
+/* 现金结账弹窗的取消大按钮也保持醒目红框 */
+.modal-box .cash-cancel-red {
+  border: 2px solid #fca5a5 !important;
+}
   </style>
 </head>
 <body>
@@ -3733,6 +3754,36 @@ function renderAccounting() {
   }
 
   requestAnimationFrame(patchStickyBar);
+})();
+
+(function enhanceModalBackdropCancel() {
+  document.addEventListener('click', function (e) {
+    const mask = e.target && e.target.classList && e.target.classList.contains('modal-mask')
+      ? e.target
+      : null;
+    if (!mask || !mask.classList.contains('show')) return;
+
+    if (typeof triggerHaptic === 'function') triggerHaptic(10);
+
+    if (mask.id === 'cash-modal' && typeof cancelCashModal === 'function') {
+      cancelCashModal();
+      return;
+    }
+
+    if (mask.id === 'quick-table-picker-modal') {
+      const cancelBtn = document.getElementById('qtp-cancel-btn');
+      if (cancelBtn && typeof cancelBtn.onclick === 'function') {
+        cancelBtn.onclick();
+        return;
+      }
+    }
+
+    if (typeof closeModal === 'function') {
+      closeModal(mask.id);
+    } else {
+      mask.classList.remove('show');
+    }
+  });
 })();
 init();
 </script>
